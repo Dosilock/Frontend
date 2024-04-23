@@ -1,5 +1,4 @@
 name: git push into another repo to deploy to vercel
-
 on:
   push:
     branches: 
@@ -24,6 +23,5 @@ jobs:
           source-directory: 'output'
           destination-github-username: 'minji-gwak'
           destination-repository-name: 'gongsilock-frontend'
-          user-email: ${{ secrets.MINJI_ACCOUNT_EMAIL }}
           commit-message: ${{ github.event.commits[0].message }}
           target-branch: main
