@@ -1,7 +1,8 @@
-name: git push into another repo to deploy to vercel
+name: Push to other repo(develop)
+
 on:
   push:
-    branches: 
+    branches:
       - develop
 
 jobs:
@@ -9,11 +10,17 @@ jobs:
     runs-on: ubuntu-latest
     container: pandoc/latex
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout develop code
+        uses: actions/checkout@v2
+        with:
+          ref: develop
+
       - name: Install mustache (to update the date)
         run: apk add ruby && gem install mustache
-      - name: creates output
+
+      - name: Creates output
         run: sh ./build.sh
+
       - name: Pushes to another repository
         id: push_directory
         uses: cpina/github-action-push-to-another-repository@main
@@ -23,5 +30,7 @@ jobs:
           source-directory: 'output'
           destination-github-username: 'minji-gwak'
           destination-repository-name: 'gongsilock-frontend'
+          user-email: 'mini0006@naver.com'
+          user-name: 'minji-gwak'
           commit-message: ${{ github.event.commits[0].message }}
           target-branch: develop
