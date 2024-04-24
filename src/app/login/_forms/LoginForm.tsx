@@ -20,8 +20,14 @@ const formSchema = z.object({
   }),
 });
 
-export default function LoginForm() {
-  const form = useForm<z.infer<typeof formSchema>>({
+export type LoginRequest = z.infer<typeof formSchema>;
+
+type LoginFormProps = {
+  onSubmit: (values: LoginRequest) => Promise<void>;
+};
+
+export const LoginForm = ({ onSubmit }: LoginFormProps) => {
+  const form = useForm<LoginRequest>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       email: '',
@@ -29,13 +35,13 @@ export default function LoginForm() {
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
-  }
+  const handleSubmit = (data: LoginRequest) => {
+    onSubmit(data);
+  };
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 w-full">
+      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6 w-full">
         <FormField
           control={form.control}
           name="email"
@@ -65,9 +71,9 @@ export default function LoginForm() {
         />
 
         <Button type="submit" className="w-full rounded-full">
-          Submit
+          로그인하기
         </Button>
       </form>
     </Form>
   );
-}
+};
