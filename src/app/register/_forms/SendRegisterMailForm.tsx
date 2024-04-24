@@ -18,43 +18,49 @@ const formSchema = z.object({
     .email('이메일 형식을 따라주셈'),
 });
 
-export default function RegisterMailForm() {
-  const router = useRouter();
+export type SendRegisterMailRequest = z.infer<typeof formSchema>;
+
+type SendRegisterMailFormProp = {
+  onSubmit: (data: SendRegisterMailRequest) => void;
+};
+
+export function SendRegisterMailForm({ onSubmit }: SendRegisterMailFormProp) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isError, setIsError] = useState(null);
 
-  const form = useForm<z.infer<typeof formSchema>>({
+  const form = useForm<SendRegisterMailRequest>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       email: '',
     },
   });
 
-  const onSubmit = async (data: z.infer<typeof formSchema>) => {
-    setIsSubmitting(true);
+  const handleSubmit = async (sendRegisterMailRequest: SendRegisterMailRequest) => {
+    onSubmit(sendRegisterMailRequest);
+    // setIsSubmitting(true);
 
-    const result = await new Promise((resolve) => {
-      setTimeout(
-        () =>
-          resolve({
-            status: 'OK',
-            message: null,
-          }),
-        1500
-      );
-    });
+    // const result = await new Promise((resolve) => {
+    //   setTimeout(
+    //     () =>
+    //       resolve({
+    //         status: 'OK',
+    //         message: null,
+    //       }),
+    //     1500
+    //   );
+    // });
 
-    if (result.status === 'OK') {
-      router.replace('/register/mail-sent');
-    } else {
-      setIsSubmitting(false);
-      setIsError(result.message);
-    }
+    // if (result.status === 'OK') {
+    //   router.replace('/register/mail-sent');
+    // } else {
+    //   setIsSubmitting(false);
+    //   setIsError(result.message);
+    // }
   };
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 w-full">
+      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6 w-full">
         <FormField
           disabled={isSubmitting}
           control={form.control}

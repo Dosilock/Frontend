@@ -1,10 +1,10 @@
-'use client';
+import { SignUpForm } from '@/app/register/_forms/SignUpForm';
 
-import SigninForm from '@/components/forms/SigninForm';
-import { useParams } from 'next/navigation';
-
-export default function Page() {
-  const { token } = useParams<{ token: string }>();
+type PageProps = {
+  params: { token: string };
+};
+export default function Page({ params }: PageProps) {
+  const { token } = params;
 
   return (
     <section className="flex flex-col w-full max-w-[48rem] rounded-lg  gap-6 p-3 md:p-8 md:mx-auto">
@@ -13,7 +13,7 @@ export default function Page() {
         <p>공시락 서비스에 필요한 정보를 입력해주세요.</p>
       </div>
 
-      <SigninForm />
+      <SignUpForm />
     </section>
   );
 }

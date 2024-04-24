@@ -27,7 +27,7 @@ const formSchema = z.object({
     }, 'File must be a PNG'),
 });
 
-export default function SigninForm() {
+export function SignUpForm() {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isError, setIsError] = useState(null);
