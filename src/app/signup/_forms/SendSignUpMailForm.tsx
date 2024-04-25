@@ -65,7 +65,7 @@ export function SendSignUpMailForm({ onSuccess }: SendSignUpMailFormProp) {
     const result = await sendSignUpMail(state, formData);
 
     if (result.status === ActionStatus.Success) {
-      onSuccess(result.fields?.email);
+      return onSuccess(result.fields?.email);
     }
 
     setState(result);

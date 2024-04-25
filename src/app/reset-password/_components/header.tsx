@@ -14,8 +14,8 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
 const pathTitleMap: Record<string, string> = {
-  '/signup/mail': '이메일로 회원가입',
-  '/signup/mail-sent': '회원가입 메일 전송 완료',
+  '/reset-password': '비밀번호 재설정',
+  '/reset-password/mail-sent': '메일 전송 완료',
 };
 
 export const Header = () => {

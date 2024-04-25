@@ -16,7 +16,7 @@ export default function Home() {
 
   return (
     <section className="grid place-items-center h-dvh">
-      <section className="flex flex-row w-full max-w-[62.5rem] rounded-lg overflow-hidden justify-center h-full max-h-[43.75rem]">
+      <section className="flex flex-row w-full max-w-[62.5rem] rounded-lg overflow-hidden justify-center h-max-min">
         <div className="py-[2rem] px-[2.625rem] flex-1 flex items-center flex-col space-y-12 h-full max-w-[48rem]">
           <Image
             className="h-[3.25rem] md:h-[5.75rem] object-contain"
