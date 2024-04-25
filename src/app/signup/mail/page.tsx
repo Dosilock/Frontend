@@ -1,9 +1,9 @@
-import { SendRegisterMailForm, SendRegisterMailRequest } from '@/app/register/_forms/SendRegisterMailForm';
-import { sendRegisterMail } from '../_forms/SendRegisterMailForm.action';
+import { SendSignUpMailForm, SendSignUpMailRequest } from '@/app/SignUp/_forms/SendSignUpMailForm';
+import { sendSignUpMail } from '../_forms/SendSignUpMailForm.action';
 
 export default function Page() {
-  const handleSubmit = async (sendReigsterFormRequest: SendRegisterMailRequest) => {
-    const response = await sendRegisterMail(sendReigsterFormRequest);
+  const handleSubmit = async (sendReigsterFormRequest: SendSignUpMailRequest) => {
+    const response = await sendSignUpMail(sendReigsterFormRequest);
 
     console.log({ response });
   };
@@ -15,7 +15,7 @@ export default function Page() {
         <p>기존의 이메일로 공시락 서비스에 가입해보세요.</p>
       </div>
 
-      <SendRegisterMailForm onSubmit={handleSubmit} />
+      <SendSignUpMailForm onSubmit={handleSubmit} />
     </section>
   );
 }

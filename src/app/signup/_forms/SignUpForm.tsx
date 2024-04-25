@@ -55,7 +55,7 @@ export function SignUpForm() {
     });
 
     if (result.status === 'OK') {
-      router.replace('/register/mail-sent');
+      router.replace('/SignUp/mail-sent');
     } else {
       setIsSubmitting(false);
       setIsError(result.message);

@@ -1,4 +1,4 @@
-import { SignUpForm } from '@/app/register/_forms/SignUpForm';
+import { SignUpForm } from '@/app/SignUp/_forms/SignUpForm';
 
 type PageProps = {
   params: { token: string };

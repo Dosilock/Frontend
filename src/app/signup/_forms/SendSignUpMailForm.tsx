@@ -18,25 +18,25 @@ const formSchema = z.object({
     .email('이메일 형식을 따라주셈'),
 });
 
-export type SendRegisterMailRequest = z.infer<typeof formSchema>;
+export type SendSignUpMailRequest = z.infer<typeof formSchema>;
 
-type SendRegisterMailFormProp = {
-  onSubmit: (data: SendRegisterMailRequest) => void;
+type SendSignUpMailFormProp = {
+  onSubmit: (data: SendSignUpMailRequest) => void;
 };
 
-export function SendRegisterMailForm({ onSubmit }: SendRegisterMailFormProp) {
+export function SendSignUpMailForm({ onSubmit }: SendSignUpMailFormProp) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isError, setIsError] = useState(null);
 
-  const form = useForm<SendRegisterMailRequest>({
+  const form = useForm<SendSignUpMailRequest>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       email: '',
     },
   });
 
-  const handleSubmit = async (sendRegisterMailRequest: SendRegisterMailRequest) => {
-    onSubmit(sendRegisterMailRequest);
+  const handleSubmit = async (sendSignUpMailRequest: SendSignUpMailRequest) => {
+    onSubmit(sendSignUpMailRequest);
     // setIsSubmitting(true);
 
     // const result = await new Promise((resolve) => {
@@ -51,7 +51,7 @@ export function SendRegisterMailForm({ onSubmit }: SendRegisterMailFormProp) {
     // });
 
     // if (result.status === 'OK') {
-    //   router.replace('/register/mail-sent');
+    //   router.replace('/SignUp/mail-sent');
     // } else {
     //   setIsSubmitting(false);
     //   setIsError(result.message);
