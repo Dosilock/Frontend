@@ -1,19 +1,16 @@
 'use server';
 
-import { LoginRequest } from './LoginForm';
+import { ActionStatus } from '@/enums/ActionStatus';
+import { FormState } from '@/types/actions';
 
-export type LoginResponse = {
-  status: String;
-  message?: string;
-};
-
-export async function loginService(loginRequest: LoginRequest) {
-  console.log({ loginRequest });
+export async function loginService(prevState: FormState, data: FormData): Promise<FormState> {
+  console.log('loginService: ', { prevState, data: Object.fromEntries(data) });
 
   // TODO: fetch Login
   await new Promise((resolve) => {
     setTimeout(() => resolve(null), 1500);
   });
 
-  return { status: 'OK' } as LoginResponse;
+  return { status: ActionStatus.Error, issues: ['에러여 에러'] };
+  // return { status: ActionStatus.Success };
 }

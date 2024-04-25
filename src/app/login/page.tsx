@@ -1,35 +1,34 @@
 import { SocialLogins } from '@/components/SocialLogins/SocialLogins';
 import Image from 'next/image';
 import Link from 'next/link';
-import { redirect } from 'next/navigation';
 import fox from '../../static/images/fox.jpg';
 import logo from '../../static/images/gongsilock-signature-bg-white.jpg';
-import { LoginForm, LoginRequest } from './_forms/LoginForm';
-import { loginService } from './_forms/LoginForm.action';
+import { LoginForm } from './_forms/LoginForm';
+import { redirect } from 'next/navigation';
 
 export default function Home() {
-  const handleSubmit = async (loginRequest: LoginRequest) => {
+  const handleSuccess = async () => {
     'use server';
-    const response = await loginService(loginRequest);
 
-    console.log({ loginRequest, response });
-
-    const { status } = response;
-
-    if (status === 'OK') {
-      redirect('/class');
-    }
-
-    // TODO: Pass the error to LoginForm
+    console.log('성공성공~');
+    redirect('/class');
   };
 
   return (
     <section className="grid place-items-center h-dvh">
-      <section className="flex flex-row w-full max-w-[62.5rem] rounded-lg overflow-hidden h-full max-h-[43.75rem]">
-        <div className="py-[2rem] px-[2.625rem] flex-1 flex items-center flex-col justify-between h-full">
-          <Image src={logo.src} width={339} height={92} alt="Gongsilock Logo" />
-          <LoginForm onSubmit={handleSubmit} />
-          <Link href="/reset-password">비밀번호 잊음?</Link>
+      <section className="flex flex-row w-full max-w-[62.5rem] rounded-lg overflow-hidden justify-center h-full max-h-[43.75rem]">
+        <div className="py-[2rem] px-[2.625rem] flex-1 flex items-center flex-col space-y-12 h-full max-w-[48rem]">
+          <Image
+            className="h-[3.25rem] md:h-[5.75rem] object-contain"
+            src={logo.src}
+            width={339}
+            height={92}
+            alt="Gongsilock Logo"
+          />
+          <LoginForm onSuccess={handleSuccess} />
+          <Link className="underline w-full text-center" href="/reset-password">
+            비밀번호를 잊으셨나요?
+          </Link>
           <SocialLogins />
         </div>
 
