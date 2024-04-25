@@ -3,30 +3,36 @@
 import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
+import { ActionStatus } from '@/enums/ActionStatus';
+import { FormState } from '@/types/actions';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useRouter } from 'next/navigation';
-import { useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { useRef, useState, useTransition } from 'react';
+import { Control, useForm } from 'react-hook-form';
 import { z } from 'zod';
+import { sendSignUpMail } from './SendSignUpMailForm.action';
 
 const formSchema = z.object({
-  email: z
-    .string()
-    .min(2, {
-      message: 'Email must be at least 2 characters.',
-    })
-    .email('이메일 형식을 따라주셈'),
+  email: z.string().email('이메일 형식을 따라주셈'),
 });
+
+const initialValues = {
+  email: '',
+};
 
 export type SendSignUpMailRequest = z.infer<typeof formSchema>;
 
 type SendSignUpMailFormProp = {
-  onSubmit: (data: SendSignUpMailRequest) => void;
+  onSuccess: (email: string) => void;
 };
 
-export function SendSignUpMailForm({ onSubmit }: SendSignUpMailFormProp) {
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isError, setIsError] = useState(null);
+export function SendSignUpMailForm({ onSuccess }: SendSignUpMailFormProp) {
+  const [isPending, startTransition] = useTransition();
+  const formRef = useRef<HTMLFormElement>(null);
+
+  const [state, setState] = useState<FormState>({
+    status: ActionStatus.Idle,
+    fields: { ...initialValues },
+  });
 
   const form = useForm<SendSignUpMailRequest>({
     resolver: zodResolver(formSchema),
@@ -35,53 +41,67 @@ export function SendSignUpMailForm({ onSubmit }: SendSignUpMailFormProp) {
     },
   });
 
-  const handleSubmit = async (sendSignUpMailRequest: SendSignUpMailRequest) => {
-    onSubmit(sendSignUpMailRequest);
-    // setIsSubmitting(true);
+  const submitText = isPending ? '전송 중...' : '회원가입 메일 보내기';
+  const hasError = state.status === ActionStatus.Error;
 
-    // const result = await new Promise((resolve) => {
-    //   setTimeout(
-    //     () =>
-    //       resolve({
-    //         status: 'OK',
-    //         message: null,
-    //       }),
-    //     1500
-    //   );
-    // });
+  const handleSubmitAfterValidation = () => {
+    if (formRef.current === null) {
+      throw new Error('formRef가 없음');
+    }
 
-    // if (result.status === 'OK') {
-    //   router.replace('/SignUp/mail-sent');
-    // } else {
-    //   setIsSubmitting(false);
-    //   setIsError(result.message);
-    // }
+    const formData = new FormData(formRef.current);
+
+    setState({
+      status: ActionStatus.Idle,
+      fields: { ...(Object.fromEntries(formData) as Record<string, string>) },
+    } as FormState);
+
+    startTransition(() => {
+      requestSignUp(formData);
+    });
+  };
+
+  const requestSignUp = async (formData: FormData) => {
+    const result = await sendSignUpMail(state, formData);
+
+    if (result.status === ActionStatus.Success) {
+      onSuccess(result.fields?.email);
+    }
+
+    setState(result);
   };
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6 w-full">
-        <FormField
-          disabled={isSubmitting}
-          control={form.control}
-          name="email"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>이메일</FormLabel>
-              <FormControl>
-                <Input placeholder="example@example.com" type="email" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+      <form className="w-full" ref={formRef} onSubmit={form.handleSubmit(handleSubmitAfterValidation)}>
+        <fieldset className="border-none space-y-2 md:space-y-6" disabled={isPending}>
+          <EmailField control={form.control} />
 
-        <Button type="submit" className="w-full rounded-full" disabled={isSubmitting}>
-          {isSubmitting ? '제출중...' : '회원가입 메일 보내기'}
-        </Button>
+          <Button type="submit" className="w-full rounded-full">
+            {submitText}
+          </Button>
+        </fieldset>
 
-        {isError && <p>{isError}</p>}
+        {hasError && <p>{state.issues[0]}</p>}
       </form>
     </Form>
   );
 }
+
+const EmailField = ({ control }: { control: Control<SendSignUpMailRequest, any> }) => {
+  return (
+    <FormField
+      control={control}
+      name="email"
+      render={({ field }) => (
+        <FormItem>
+          <FormLabel>이메일</FormLabel>
+          <FormControl>
+            <Input placeholder="example@example.com" type="email" {...field} />
+          </FormControl>
+          <FormMessage />
+        </FormItem>
+      )}
+    />
+  );
+};
