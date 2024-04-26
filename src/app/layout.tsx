@@ -2,7 +2,6 @@ import type { Metadata } from 'next';
 import localFont from 'next/font/local';
 import './globals.css';
 import { cn } from '@/lib/utils';
-import NextAuthProvider from '@/components/NextAuthProvider/NextAuthProvider';
 
 const pretendard = localFont({
   src: '../static/fonts/PretendardVariable.woff2',
@@ -23,7 +22,7 @@ export default function RootLayout({
   return (
     <html lang="ko">
       <body className={cn(pretendard.className, '')}>
-        <NextAuthProvider>{children}</NextAuthProvider>
+        {children}
       </body>
     </html>
   );
