@@ -101,11 +101,11 @@ export const LoginForm = ({ onSuccess }: LoginFormProps) => {
   return (
     <Form {...form}>
       <form className="w-full" ref={formRef} onSubmit={form.handleSubmit(handleSubmitAfterValidation)}>
-        <fieldset className="border-none space-y-2 w-full md:space-y-8" disabled={isPending}>
+        <fieldset className="border-none space-y-2 w-full md:space-y-6" disabled={isPending}>
           <EmailField control={form.control} />
           <PasswordField control={form.control} />
 
-          <Button className="w-full rounded-full mt-2" type="submit">
+          <Button className="w-full rounded-full py-4" type="submit">
             {submitText}
           </Button>
         </fieldset>
