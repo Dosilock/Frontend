@@ -55,7 +55,7 @@ export function SignUpForm() {
     });
 
     if (result.status === 'OK') {
-      router.replace('/SignUp/mail-sent');
+      router.replace('/class');
     } else {
       setIsSubmitting(false);
       setIsError(result.message);
@@ -64,44 +64,51 @@ export function SignUpForm() {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 w-full" encType="multipart/form-data">
-        <FormField
-          disabled={isSubmitting}
-          control={form.control}
-          name="username"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>이름*</FormLabel>
-              <FormDescription>다른 친구들에게 보여질 이름을 입력해주세요.</FormDescription>
-              <FormControl>
-                <Input placeholder="공식이" type="text" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        className="space-y-6  w-full h-full flex flex-col "
+        encType="multipart/form-data">
+        <fieldset className="flex flex-col border-none space-y-2 md:space-y-6 h-full" disabled={false}>
+          <FormField
+            disabled={isSubmitting}
+            control={form.control}
+            name="username"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>이름*</FormLabel>
+                <FormDescription>다른 친구들에게 보여질 이름을 입력해주세요.</FormDescription>
+                <FormControl>
+                  <Input placeholder="공식이" type="text" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-        <FormField
-          disabled={isSubmitting}
-          control={form.control}
-          name="profileImage"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>프로필 사진</FormLabel>
-              <FormDescription>본인을 나타낼 수 있는 프로필 사진을 설정해주세요.</FormDescription>
-              <FormControl>
-                <Input type="file" accept="image/png" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+          <FormField
+            disabled={isSubmitting}
+            control={form.control}
+            name="profileImage"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>프로필 사진</FormLabel>
+                <FormDescription>본인을 나타낼 수 있는 프로필 사진을 설정해주세요.</FormDescription>
+                <FormControl>
+                  <Input type="file" accept="image/png" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-        <Button type="submit" className="w-full rounded-full" disabled={isSubmitting}>
-          {isSubmitting ? '제출중...' : '회원가입'}
-        </Button>
+          <div className="flex-1 flex flex-col justify-end">
+            <Button type="submit" className="w-full rounded-full" disabled={isSubmitting}>
+              {isSubmitting ? '제출중...' : '회원가입'}
+            </Button>
+          </div>
 
-        {isError && <p>{isError}</p>}
+          {isError && <p>{isError}</p>}
+        </fieldset>
       </form>
     </Form>
   );

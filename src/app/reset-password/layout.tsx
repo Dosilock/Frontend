@@ -21,11 +21,5 @@ export default function Layout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  return (
-    <>
-      <Header />
-
-      {children}
-    </>
-  );
+  return <>{children}</>;
 }

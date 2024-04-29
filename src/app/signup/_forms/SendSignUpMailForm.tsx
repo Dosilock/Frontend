@@ -66,20 +66,22 @@ export function SendSignUpMailForm({ onSuccess }: SendSignUpMailFormProp) {
 
     if (result.status === ActionStatus.Success) {
       return onSuccess(result.fields?.email);
+    } else {
+      setState(result);
     }
-
-    setState(result);
   };
 
   return (
     <Form {...form}>
-      <form className="w-full" ref={formRef} onSubmit={form.handleSubmit(handleSubmitAfterValidation)}>
-        <fieldset className="border-none space-y-2 md:space-y-6" disabled={isPending}>
+      <form className="w-full h-full" ref={formRef} onSubmit={form.handleSubmit(handleSubmitAfterValidation)}>
+        <fieldset className="flex flex-col border-none space-y-2 md:space-y-6 h-full" disabled={isPending}>
           <EmailField control={form.control} />
 
-          <Button type="submit" className="w-full rounded-full">
-            {submitText}
-          </Button>
+          <div className="flex-1 flex flex-col justify-end">
+            <Button type="submit" className="w-full rounded-full">
+              {submitText}
+            </Button>
+          </div>
         </fieldset>
 
         {hasError && <p>{state.issues[0]}</p>}
