@@ -51,7 +51,7 @@ export default function Page() {
       <TitleWithDescription title="반 선택" description="참여할 반을 선택해주세요." />
 
       <div>
-        <h6 className="font-semibold">반 목록</h6>
+        <h6 className="font-semibold mb-3">반 목록</h6>
 
         {/* TODO: ErrorBoundary */}
         <Suspense fallback={<div>반 목록을 불러오는 중입니다...</div>}>
@@ -104,7 +104,9 @@ const ManageBadge = () => {
 
 const CreateNewClassButton = () => {
   return (
-    <a className="flex flex-row justify-center items-center gap-1 rounded-full border border-green-600 border-dashed py-3 text-green-600">
+    <a
+      href="/class/create/required"
+      className="flex flex-row justify-center items-center gap-1 rounded-full border border-green-600 border-dashed py-3 text-green-600">
       <CirclePlus className="size-4" />
       새로운 반을 만드시겠어요?
     </a>
