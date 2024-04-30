@@ -1,4 +1,4 @@
-import logo from '@/static/images/gongsilock-signature-bg-white.jpg';
+import logo from '@/static/images/gongsilock-signature-transparent.png';
 import Image from 'next/image';
 
 export const GongsilockLogo = () => {
