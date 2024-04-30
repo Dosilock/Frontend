@@ -46,7 +46,7 @@ const getClassList = async (): Promise<ClassItem[]> => {
 
 export default function Page() {
   return (
-    <section className="p-6 max-w-[48rem] mx-auto space-y-[3rem] md:p-10">
+    <section className="py-[4.5rem] px-6 max-w-[48rem] mx-auto space-y-[3rem] md:p-10">
       <GongsilockLogo />
       <TitleWithDescription title="반 선택" description="참여할 반을 선택해주세요." />
 

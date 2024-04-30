@@ -12,16 +12,13 @@ import { Control, useForm } from 'react-hook-form';
 import { z } from 'zod';
 
 const formSchema = z.object({
-  name: z
-    .string()
-    .min(2, '반 이름은 최소 2글자 이상이어야 해요.')
-    .max(50, '반 이름은 최대 50글자 이하여야 해요.')
-    .refine((data) => {
-      const emojiRegex = /\p{Emoji}/u;
-      const hasEmoji = emojiRegex.test(data);
+  name: z.string().min(2, '반 이름은 최소 2글자 이상이어야 해요.').max(50, '반 이름은 최대 50글자 이하여야 해요.'),
+  // .refine((data) => {
+  //   const emojiRegex = /\p{Emoji}/u;
+  //   const hasEmoji = emojiRegex.test(data);
 
-      return !hasEmoji;
-    }, '이모지는 사용할 수 없어요.'),
+  //   return !hasEmoji;
+  // }, '이모지는 사용할 수 없어요.'),
   emoji: z.string().emoji(),
   description: z.string().optional(),
 });
@@ -57,8 +54,8 @@ export function RequiredForm({ onSuccess }: RequiredFormProp) {
 
   return (
     <Form {...form}>
-      <form className="w-full h-full" ref={formRef} onSubmit={form.handleSubmit(handleSubmitAfterValidation)}>
-        <fieldset className="flex flex-col border-none space-y-2 md:space-y-6 h-full">
+      <form className="w-full flex-1 flex" ref={formRef} onSubmit={form.handleSubmit(handleSubmitAfterValidation)}>
+        <fieldset className="flex flex-col border-none space-y-2 md:space-y-6 flex-1 w-full">
           <FormField
             control={form.control}
             name="name"
