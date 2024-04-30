@@ -10,7 +10,7 @@ export default function Page() {
       <RequiredForm
         onSuccess={async () => {
           'use server';
-          redirect('/class/create/template');
+          redirect('/class/create/step/template');
         }}
       />
     </section>

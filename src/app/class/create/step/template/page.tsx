@@ -36,7 +36,7 @@ export default function Page() {
 
       <a
         className="w-full py-3 rounded-full bg-green-500 block text-center font-semibold text-white"
-        href="/class/create/timetable">
+        href="/class/create/step/timetable">
         다음
       </a>
     </section>
