@@ -8,13 +8,16 @@ export default function Layout({
   children: React.ReactNode;
 }>) {
   return (
-    <section className="w-full max-w-[48rem] mx-auto py-[4.5rem] space-y-[3rem]">
+    <section className="w-full max-w-[48rem] mx-auto py-[4.5rem] space-y-[3rem] px-6 h-dvh">
       <GongsilockLogo />
 
+      {/**
+       * Note: Route 기반으로 할지, Context 기반으로 할지 고민해보기
+       * */}
       <ol className="flex flex-row justify-between w-full items-center">
-        <Step step={1} title="반 만들기" isCurrentStep={false} isDoneStep={true} />
-        <StepSeparate isProgressed={true} />
-        <Step step={2} title="템플릿 선택" isCurrentStep={true} isDoneStep={false} />
+        <Step step={1} title="반 만들기" isCurrentStep={true} isDoneStep={false} />
+        <StepSeparate isProgressed={false} />
+        <Step step={2} title="템플릿 선택" isCurrentStep={false} isDoneStep={false} />
         <StepSeparate isProgressed={false} />
         <Step step={3} title="시간표 설정" isCurrentStep={false} isDoneStep={false} />
         <StepSeparate isProgressed={false} />
@@ -66,7 +69,7 @@ type StepSeparteProp = {
 const StepSeparate = ({ isProgressed }: StepSeparteProp) => {
   return (
     <Ellipsis
-      className={cn({
+      className={cn('hidden md:block', {
         ['text-gray-300']: !isProgressed,
         ['text-green-600']: isProgressed,
       })}
