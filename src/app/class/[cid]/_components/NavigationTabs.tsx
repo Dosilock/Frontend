@@ -14,16 +14,16 @@ type NavigationRoute = {
 };
 
 const navigationRoutes: NavigationRoute[] = [
-  { path: '/dashboard', name: '대시보드', icon: <Home className="size-5" /> },
-  { path: '/focus', name: '집중모드', icon: <Timer /> },
-  { path: '/camstudy', name: '대시보드', icon: <Camera /> },
+  { path: '/dashboard', name: '대시보드', icon: <Home className="size-4 md:size-5" /> },
+  { path: '/focus', name: '집중모드', icon: <Timer className="size-4 md:size-5" /> },
+  { path: '/camstudy', name: '대시보드', icon: <Camera className="size-4 md:size-5" /> },
 ];
 
 export const NavigationTabs = () => {
   const pathname = usePathname().split('?', 2)[0];
 
   return (
-    <nav className="flex flex-row relative p-3 md:p-6 lg:justify-center">
+    <nav className="flex flex-row relative pb-3 pointer-events-none md:pb-6 md:gap-2 lg:justify-center">
       {navigationRoutes.map((navigationRoute) => (
         <NavigationTab
           key={navigationRoute.path}
@@ -41,12 +41,15 @@ type NavigationTabProps = { isActive: boolean } & NavigationRoute;
 const NavigationTab = ({ path, name, icon, isActive }: NavigationTabProps) => {
   return (
     <Link
-      className={cn('flex flex-row gap-2 items-center px-4 py-3 rounded font-semibold transition-colors relative', {
-        ['bg-green-50 text-green-700']: isActive,
-      })}
+      className={cn(
+        'flex flex-row gap-2 items-center px-4 py-3 rounded font-semibold transition-colors relative pointer-events-auto',
+        {
+          ['bg-green-50 text-green-700']: isActive,
+        }
+      )}
       href={`.${path}`}>
       {icon}
-      <span className="text-xl">{name}</span>
+      <span className="text-base md:text-xl">{name}</span>
       {isActive && <EmphasisBar />}
     </Link>
   );
@@ -62,5 +65,7 @@ const EmphasisBar = () => {
 };
 
 const EmphasisBarBackground = () => {
-  return <div className="absolute left-0 -bottom-0 h-[.0625rem] rounded-bl-lg rounded-br-lg w-screen bg-gray-200" />;
+  return (
+    <div className="absolute -left-3 -bottom-0 h-[.0625rem] rounded-bl-lg rounded-br-lg w-dvw bg-gray-200 md:-left-6" />
+  );
 };
