@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { ActionStatus } from '@/enums/ActionStatus';
 import { FormState } from '@/types/actions';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useRef, useState, useTransition } from 'react';
+import { PropsWithChildren, useRef, useState, useTransition } from 'react';
 import { Control, useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { sendSignUpMail } from './SendSignUpMailForm.action';
@@ -15,11 +15,11 @@ const formSchema = z.object({
   email: z.string().email('이메일 형식을 따라주셈'),
 });
 
-const initialValues = {
+export type SendSignUpMailRequest = z.infer<typeof formSchema>;
+
+const initialValues: SendSignUpMailRequest = {
   email: '',
 };
-
-export type SendSignUpMailRequest = z.infer<typeof formSchema>;
 
 type SendSignUpMailFormProp = {
   onSuccess: (email: string) => void;
@@ -36,9 +36,7 @@ export function SendSignUpMailForm({ onSuccess }: SendSignUpMailFormProp) {
 
   const form = useForm<SendSignUpMailRequest>({
     resolver: zodResolver(formSchema),
-    defaultValues: {
-      email: '',
-    },
+    defaultValues: { ...state.fields },
   });
 
   const submitText = isPending ? '전송 중...' : '회원가입 메일 보내기';
@@ -57,11 +55,11 @@ export function SendSignUpMailForm({ onSuccess }: SendSignUpMailFormProp) {
     } as FormState);
 
     startTransition(() => {
-      requestSignUp(formData);
+      requestSendSignUpMail(formData);
     });
   };
 
-  const requestSignUp = async (formData: FormData) => {
+  const requestSendSignUpMail = async (formData: FormData) => {
     const result = await sendSignUpMail(state, formData);
 
     if (result.status === ActionStatus.Success) {
@@ -73,18 +71,12 @@ export function SendSignUpMailForm({ onSuccess }: SendSignUpMailFormProp) {
 
   return (
     <Form {...form}>
-      <form className="w-full h-full" ref={formRef} onSubmit={form.handleSubmit(handleSubmitAfterValidation)}>
-        <fieldset className="flex flex-col border-none space-y-2 md:space-y-6 h-full" disabled={isPending}>
+      <form className="w-full flex-1 flex" ref={formRef} onSubmit={form.handleSubmit(handleSubmitAfterValidation)}>
+        <fieldset className="flex-1 flex flex-col border-none space-y-2 md:space-y-6" disabled={isPending}>
           <EmailField control={form.control} />
-
-          <div className="flex-1 flex flex-col justify-end">
-            <Button type="submit" className="w-full rounded-full">
-              {submitText}
-            </Button>
-          </div>
+          {hasError && <p>{state.issues[0]}</p>}
+          <SubmitButton>{submitText}</SubmitButton>
         </fieldset>
-
-        {hasError && <p>{state.issues[0]}</p>}
       </form>
     </Form>
   );
@@ -105,5 +97,15 @@ const EmailField = ({ control }: { control: Control<SendSignUpMailRequest, any> 
         </FormItem>
       )}
     />
+  );
+};
+
+const SubmitButton = ({ children }: PropsWithChildren) => {
+  return (
+    <div className="flex-1 flex flex-col justify-end">
+      <Button type="submit" className="w-full rounded-full">
+        {children}
+      </Button>
+    </div>
   );
 };

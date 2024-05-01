@@ -25,7 +25,7 @@ export default function Page({ searchParams }: { searchParams?: { mail: string }
         <Image className="w-full aspect-[3/1] object-cover" src={fox.src} width={1084} height={720} alt="fox" />
         <h1 className="text-2xl font-bold">비밀번호 재설정 메일을 보냈습니다.</h1>
         <p className="text-center">
-          <strong>{mail}</strong>으로 회원가입 메일을 보냈어요! <br />
+          <strong>{mail}</strong>으로 비밀번호 재설정 메일을 보냈어요! <br />
           메일을 확인해주세요.
         </p>
 
