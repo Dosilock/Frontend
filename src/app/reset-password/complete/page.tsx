@@ -4,7 +4,6 @@ import { GongsilockLogo } from '@/components/GongsilockLogo/GongsilockLogo';
 import { Button } from '@/components/ui/button';
 import fox from '@/static/images/fox.jpg';
 import Link from 'next/link';
-import { notFound } from 'next/navigation';
 
 export default function Page() {
   return (
