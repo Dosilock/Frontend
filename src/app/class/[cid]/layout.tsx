@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { PropsWithChildren } from 'react';
+import { NavigationTabs } from './_components/NavigationTabs';
 
 export default function Layout({ children, params }: PropsWithChildren<{ params: { cid: string } }>) {
   // const { cid } = params;
@@ -11,11 +12,8 @@ export default function Layout({ children, params }: PropsWithChildren<{ params:
 
   return (
     <div>
-      <header>
-        <Link href="./dashboard">대시보드</Link>
-        <Link href="./focus">집중모드</Link>
-        <Link href="./camstudy">캠스터디</Link>
-      </header>
+      <NavigationTabs />
+
       <main>{children}</main>
     </div>
   );
