@@ -1,8 +1,6 @@
-import Link from 'next/link';
-import { notFound } from 'next/navigation';
+import { ChevronDown, School, Settings } from 'lucide-react';
 import { PropsWithChildren } from 'react';
 import { NavigationTabs } from './_components/NavigationTabs';
-import { ChevronDown, Expand, School, Settings } from 'lucide-react';
 
 export default function Layout({ children, params }: PropsWithChildren<{ params: { cid: string } }>) {
   // const { cid } = params;

@@ -16,7 +16,7 @@ type NavigationRoute = {
 const navigationRoutes: NavigationRoute[] = [
   { path: '/dashboard', name: '대시보드', icon: <Home className="size-4 md:size-5" /> },
   { path: '/focus', name: '집중모드', icon: <Timer className="size-4 md:size-5" /> },
-  { path: '/camstudy', name: '대시보드', icon: <Camera className="size-4 md:size-5" /> },
+  { path: '/camstudy', name: '캠스터디', icon: <Camera className="size-4 md:size-5" /> },
 ];
 
 export const NavigationTabs = () => {
