@@ -1,8 +1,9 @@
 'use client';
+
 import { cn } from '@/lib/utils';
 import { addMinutes, differenceInMinutes, format, isSameMinute } from 'date-fns';
 import { ko } from 'date-fns/locale';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 
 enum LabelType {
   SHORT,
@@ -41,9 +42,9 @@ const getTimeLabel = (time: Date, labelType: LabelType = LabelType.SHORT) => {
 
 export const PeriodTimeline = () => {
   /** Prop으로 받을 것(아마도): startTime, endTime, currentTime */
-  const startTime = new Date('2024-05-02 13:30:00');
-  const endTime = new Date('2024-05-02 17:30:00');
-  const [currentTime, setCurrentTime] = useState(new Date('2024-05-02 13:30:00'));
+  const startTime = new Date('2024-05-03 13:30:00');
+  const endTime = new Date('2024-05-03 17:30:00');
+  const [currentTime, setCurrentTime] = useState(new Date('2024-05-03 13:30:00'));
 
   const [isOverMobileSize, setIsOverMobileSize] = useState(
     () => typeof window === 'object' && window.innerWidth >= 768
@@ -73,6 +74,32 @@ export const PeriodTimeline = () => {
   const doneCalcuateMargin = marginInterpolation !== 0;
 
   useEffect(() => {
+    const calcuateMobileSize = () => {
+      setIsOverMobileSize(window.innerWidth >= 768);
+    };
+
+    calcuateMobileSize();
+
+    window.addEventListener('resize', calcuateMobileSize);
+
+    /** 기능 테스트용 */
+    const timerId = setInterval(() => {
+      setCurrentTime((prevData) => {
+        if (isSameMinute(prevData, endTime)) {
+          clearInterval(timerId);
+          return prevData;
+        }
+        return addMinutes(prevData, 1);
+      });
+    }, 1000);
+
+    return () => {
+      window.removeEventListener('resize', calcuateMobileSize);
+      clearInterval(timerId);
+    };
+  }, []);
+
+  useEffect(() => {
     const calcuateMargin = () => {
       const milestone = document.querySelector('.milestone');
 
@@ -84,40 +111,8 @@ export const PeriodTimeline = () => {
       setMarginInterpolation(margin);
     };
 
-    const calcuateMobileSize = () => {
-      setIsOverMobileSize(window.innerWidth >= 768);
-    };
-
-    const handleResize = () => {
-      calcuateMobileSize();
-      calcuateMargin();
-    };
-
-    calcuateMobileSize();
     calcuateMargin();
-
-    window.addEventListener('resize', handleResize);
-
-    /** 기능 테스트용 */
-    const timerId = setInterval(() => {
-      setCurrentTime((prevData) => {
-        if (isSameMinute(prevData, endTime)) {
-          clearInterval(timerId);
-          return prevData;
-        }
-        return addMinutes(prevData, 1);
-      });
-    }, 100);
-
-    return () => {
-      window.removeEventListener('resize', handleResize);
-      clearInterval(timerId);
-    };
-
-    // return () => {
-    //   clearInterval(timerId);
-    // };
-  }, []);
+  }, [labelType]);
 
   return (
     <div className="flex-1">
@@ -146,7 +141,9 @@ export const PeriodTimeline = () => {
       {/* 시작 시작, 종료 시간 */}
       <div className="flex-1 flex flex-row justify-between -translate-y-1 pointer-events-none relative">
         <TimeMilestone milestoneLabel="시작" timeLabel={startTimeLabel} order={TimeMilestoneOrder.DOT_TO_TIME} />
-        <TimeMilestone milestoneLabel="종료" timeLabel={endTimeLabel} order={TimeMilestoneOrder.DOT_TO_TIME} />
+        <div className="">
+          <TimeMilestone milestoneLabel="종료" timeLabel={endTimeLabel} order={TimeMilestoneOrder.DOT_TO_TIME} />
+        </div>
       </div>
     </div>
   );
@@ -168,10 +165,8 @@ const DurationLabel = ({ label, timeRatio }: DurationLabelProp) => {
       return;
     }
 
-    const parentWidth = parentRef.current.getBoundingClientRect().width;
-    const childWidth = childRef.current.getBoundingClientRect().width;
-
-    console.log(parentWidth, childWidth);
+    const { width: parentWidth } = parentRef.current.getBoundingClientRect();
+    const { width: childWidth } = childRef.current.getBoundingClientRect();
 
     setIsNarrow(parentWidth <= childWidth);
   }, [label]);
@@ -213,10 +208,8 @@ const TimeMilestone = ({ milestoneLabel, order, timeLabel, isActive }: TimeMiles
       className={cn(
         'milestone flex gap-2 justify-center items-center transition-transform pointer-events-auto pointerdevice:hover:scale-125',
         {
-          ['flex-col']: isDotToTime,
-          ['flex-col-reverse']: isTimeToDot,
-          ['origin-bottom']: isTimeToDot,
-          ['origin-top']: isDotToTime,
+          ['flex-col origin-top']: isDotToTime,
+          ['flex-col-reverse origin-bottom']: isTimeToDot,
         }
       )}>
       <div

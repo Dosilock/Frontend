@@ -1,4 +1,4 @@
-import { Expand, Pause } from 'lucide-react';
+import { Pause } from 'lucide-react';
 import { PeriodTimeline } from './_components/PeriodTimeline';
 
 export default function Page() {
@@ -27,31 +27,6 @@ export default function Page() {
          */}
         <div className="flex-1 flex items-center justify-center select-none">
           <PeriodTimeline />
-          {/* <div className="flex-1">
-            <div
-              className={cn('relative opacity-0 transition-opacity', { ['opacity-100']: doneCalcuateMargin })}
-              style={{ marginInline: `${marginInterpolation}px` }}>
-              <div className="inline-block text-center w-[30%] translate-y-1/2">
-                <span className="text-xs px-1 py-[.125rem] bg-gray-50 rounded text-gray-700">1H</span>
-              </div>
-              <div className="absolute left-[30%] bottom-0 -translate-x-1/2 translate-y-1">
-                <TimeMilestone
-                  milestoneLabel="현재"
-                  timeLabel="14:30"
-                  order={TimeMilestoneOrder.TIME_TO_DOT}
-                  isActive
-                />
-              </div>
-              <div className="inline-block text-center w-[70%] translate-y-1/2">
-                <span className="text-xs px-1 py-[.125rem] bg-gray-50 rounded text-gray-700">3H</span>
-              </div>
-              <TimeMilestoneLine />
-            </div>
-            <div className="flex-1 flex flex-row justify-between -translate-y-1">
-              <TimeMilestone milestoneLabel="시작" timeLabel="13:30" order={TimeMilestoneOrder.DOT_TO_TIME} />
-              <TimeMilestone milestoneLabel="종료" timeLabel="17:30" order={TimeMilestoneOrder.DOT_TO_TIME} />
-            </div>
-          </div> */}
         </div>
 
         {/* <div className="absolute top-0 right-0">
