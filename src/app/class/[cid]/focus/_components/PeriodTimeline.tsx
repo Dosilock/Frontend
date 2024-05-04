@@ -1,7 +1,18 @@
 'use client';
 
 import { cn } from '@/lib/utils';
-import { addMinutes, differenceInMinutes, format, isSameMinute } from 'date-fns';
+import {
+  addDays,
+  addMinutes,
+  differenceInMinutes,
+  format,
+  getMinutes,
+  isSameMinute,
+  setHours,
+  setMinutes,
+  setSeconds,
+  subMinutes,
+} from 'date-fns';
 import { ko } from 'date-fns/locale';
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useCurrentTime } from '../../_store/useCurrentTime';
@@ -39,17 +50,35 @@ const getTimeLabel = (time: Date, labelType: LabelType = LabelType.SHORT) => {
   return format(time, isLongType ? 'aa h시 mm분' : 'HH:mm', { locale: ko });
 };
 
+const getNextDayAtFiveAM = (date: Date) => {
+  let nextDay = addDays(date, 1);
+
+  nextDay = setHours(nextDay, 5);
+  nextDay = setMinutes(nextDay, 0);
+  nextDay = setSeconds(nextDay, 0);
+
+  return nextDay;
+};
+
 export const PeriodTimeline = () => {
   /** Prop으로 받을 것(아마도): startTime, endTime, currentTime */
-  const { currentPeriod } = usePeriod();
-
-  const startTime = currentPeriod?.startTime || new Date('2024-05-04 13:00:00');
-  const endTime = addMinutes(
-    currentPeriod?.startTime || new Date('2024-05-04 13:50:00'),
-    currentPeriod?.duration || 10
-  );
-  // const [currentTime, setCurrentTime] = useState(new Date('2024-05-03 13:30:00'));
+  const { periods, currentPeriod } = usePeriod();
   const { currentTime } = useCurrentTime();
+
+  let startTime = currentPeriod?.startTime || new Date('2024-05-04 13:00:00');
+  let endTime = addMinutes(currentPeriod?.startTime || new Date('2024-05-04 13:50:00'), currentPeriod?.duration || 10);
+
+  if (currentPeriod === -1) {
+    startTime = subMinutes(currentTime, getMinutes(currentTime));
+    endTime = periods[0].startTime;
+  } else if (currentPeriod === 99) {
+    const lastPeriod = periods.at(-1)!;
+
+    startTime = addMinutes(lastPeriod.startTime, lastPeriod.duration);
+    endTime = getNextDayAtFiveAM(startTime);
+  }
+
+  // const [currentTime, setCurrentTime] = useState(new Date('2024-05-03 13:30:00'));
 
   const [isOverMobileSize, setIsOverMobileSize] = useState(
     () => typeof window === 'object' && window.innerWidth >= 768

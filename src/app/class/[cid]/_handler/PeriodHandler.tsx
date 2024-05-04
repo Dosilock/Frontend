@@ -7,7 +7,11 @@ import { addMinutes } from 'date-fns';
 
 export const PeriodHandler = ({ timetable }: { timetable: Period[] }) => {
   const { currentTime } = useCurrentTime();
-  const { updatePeriod } = usePeriod();
+  const { updatePeriod, setPeriods } = usePeriod();
+
+  useEffect(() => {
+    setPeriods(timetable);
+  }, []);
 
   useEffect(() => {
     const currentPeriod = getCurrentPeriod(timetable, currentTime);

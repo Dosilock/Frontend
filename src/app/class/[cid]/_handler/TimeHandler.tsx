@@ -20,7 +20,7 @@ export const TimeHandler = ({ serverTime }: { serverTime: Date }) => {
 
     const timerEvent = {
       action: 'start_timer',
-      payload: { interval: 1000 },
+      payload: { interval: 100 },
     };
     // const timerEvent: TimerEvent = {
     //   action: TimerEventAction.START_TIMER,

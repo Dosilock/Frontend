@@ -26,7 +26,7 @@ export default async function Layout({ children, params }: PropsWithChildren<{ p
   // if (cid !== '12321') {
   //   notFound();
   // }
-  const getServerTime = async () => requestEchoAPI(new Date('2024-05-04 13:00:00'));
+  const getServerTime = async () => requestEchoAPI(new Date('2024-05-04 12:45:00'));
   const getTimetable = async () => requestEchoAPI(_timetable);
 
   const serverTime = await getServerTime();

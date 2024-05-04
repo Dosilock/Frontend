@@ -6,7 +6,7 @@ export const useCurrentTime = create<{
   setTime: (newTime: Date) => void;
   tick: () => void;
 }>((set) => ({
-  currentTime: new Date('2024-05-04 13:00:00'),
+  currentTime: new Date('2024-05-04 12:45:00'),
   setTime: (newTime: Date) => set({ currentTime: newTime }),
   tick: () => set(({ currentTime: prevTime }) => ({ currentTime: addMinutes(prevTime, 1) })),
 }));
