@@ -4,6 +4,8 @@ import { cn } from '@/lib/utils';
 import { addMinutes, differenceInMinutes, format, isSameMinute } from 'date-fns';
 import { ko } from 'date-fns/locale';
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { useCurrentTime } from '../../_store/useCurrentTime';
+import { usePeriod } from '../../_store/usePeriod';
 
 enum LabelType {
   SHORT,
@@ -37,14 +39,17 @@ const getTimeLabel = (time: Date, labelType: LabelType = LabelType.SHORT) => {
   return format(time, isLongType ? 'aa h시 mm분' : 'HH:mm', { locale: ko });
 };
 
-// TODO: 모바일, 타블렛 에서 라벨 표기 전환 및 margin 보정
-// 크기가 바뀌면 margin 보정이 먼저 일어나고, 그 다음 표기가 바뀌어서 맞지 않는다.
-
 export const PeriodTimeline = () => {
   /** Prop으로 받을 것(아마도): startTime, endTime, currentTime */
-  const startTime = new Date('2024-05-03 13:30:00');
-  const endTime = new Date('2024-05-03 17:30:00');
-  const [currentTime, setCurrentTime] = useState(new Date('2024-05-03 13:30:00'));
+  const { currentPeriod } = usePeriod();
+
+  const startTime = currentPeriod?.startTime || new Date('2024-05-04 13:00:00');
+  const endTime = addMinutes(
+    currentPeriod?.startTime || new Date('2024-05-04 13:50:00'),
+    currentPeriod?.duration || 10
+  );
+  // const [currentTime, setCurrentTime] = useState(new Date('2024-05-03 13:30:00'));
+  const { currentTime } = useCurrentTime();
 
   const [isOverMobileSize, setIsOverMobileSize] = useState(
     () => typeof window === 'object' && window.innerWidth >= 768
@@ -83,19 +88,19 @@ export const PeriodTimeline = () => {
     window.addEventListener('resize', calcuateMobileSize);
 
     /** 기능 테스트용 */
-    const timerId = setInterval(() => {
-      setCurrentTime((prevData) => {
-        if (isSameMinute(prevData, endTime)) {
-          clearInterval(timerId);
-          return prevData;
-        }
-        return addMinutes(prevData, 1);
-      });
-    }, 1000);
+    // const timerId = setInterval(() => {
+    //   setCurrentTime((prevData) => {
+    //     if (isSameMinute(prevData, endTime)) {
+    //       clearInterval(timerId);
+    //       return prevData;
+    //     }
+    //     return addMinutes(prevData, 1);
+    //   });
+    // }, 1000);
 
     return () => {
       window.removeEventListener('resize', calcuateMobileSize);
-      clearInterval(timerId);
+      // clearInterval(timerId);
     };
   }, []);
 

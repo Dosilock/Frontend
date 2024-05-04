@@ -1,12 +1,12 @@
 'use client';
 
 // // timetable은 순서 보장.
-// const timetable = [
-//   { id: 0, name: '오전1', startTime: new Date('2024-05-03 13:00:00'), duration: 10, isAttendacneRequired: false },
-//   { id: 1, name: '쉬는 시간', startTime: new Date('2024-05-03 13:10:00'), duration: 10, isAttendacneRequired: false },
-//   { id: 2, name: '오전2', startTime: new Date('2024-05-03 13:20:00'), duration: 10, isAttendacneRequired: false },
-//   { id: 3, name: '쉬는 시간', startTime: new Date('2024-05-03 13:30:00'), duration: 10, isAttendacneRequired: false },
-// ];
+const timetable = [
+  { id: 0, name: '오전1', startTime: new Date('2024-05-03 13:00:00'), duration: 10, isAttendacneRequired: false },
+  { id: 1, name: '쉬는 시간', startTime: new Date('2024-05-03 13:10:00'), duration: 10, isAttendacneRequired: false },
+  { id: 2, name: '오전2', startTime: new Date('2024-05-03 13:20:00'), duration: 10, isAttendacneRequired: false },
+  { id: 3, name: '쉬는 시간', startTime: new Date('2024-05-03 13:30:00'), duration: 10, isAttendacneRequired: false },
+];
 
 import EventEmitter from './EventEmitter';
 

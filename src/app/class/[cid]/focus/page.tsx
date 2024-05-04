@@ -1,5 +1,6 @@
 import { Pause } from 'lucide-react';
 import { PeriodTimeline } from './_components/PeriodTimeline';
+import { PeriodName } from './_components/PeriodName';
 
 export default function Page() {
   return (
@@ -8,10 +9,11 @@ export default function Page() {
         id="focusSection"
         className="flex-1 flex flex-col min-h-[calc(100dvh-9.5rem)] relative md:min-h-[calc(100dvh-14rem)] lg:min-h-[calc(100dvh-9.25rem)] bg-gray-50">
         <div className="flex-1 flex justify-center items-center">
-          <div>
+          <PeriodName />
+          {/* <div>
             <p className="text-[2.625rem] font-bold text-green-700">오후1</p>
             <p className="text-lg font-semibold text-green-700 text-center">4시간</p>
-          </div>
+          </div> */}
         </div>
         <div className="flex-1 flex items-center justify-center">
           <button className="w-full text-[1.3125rem] flex flex-row gap-2 items-center justify-center py-3 bg-green-50 rounded shadow-focusBtn active:scale-95 transition-transform">
