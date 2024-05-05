@@ -9,7 +9,7 @@ export default function Page() {
     <section className="flex flex-col gap-6 lg:flex-row">
       <div
         id="focusSection"
-        className="flex-1 flex flex-col min-h-[calc(100dvh-9.5rem)] relative md:min-h-[calc(100dvh-14rem)] lg:min-h-[calc(100dvh-9.25rem)] bg-gray-50">
+        className="flex-1 flex flex-col min-h-[calc(100dvh-9.5rem)] relative md:min-h-[calc(100dvh-14rem)] lg:min-h-[calc(100dvh-9.25rem)] lg:max-w-[40.625rem] bg-gray-50">
         <div className="flex-1 flex justify-center items-center">
           <PeriodName />
         </div>
