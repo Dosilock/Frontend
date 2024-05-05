@@ -7,16 +7,30 @@ import {
   differenceInMinutes,
   format,
   getMinutes,
-  isSameMinute,
   setHours,
   setMinutes,
   setSeconds,
   subMinutes,
 } from 'date-fns';
 import { ko } from 'date-fns/locale';
-import { useEffect, useLayoutEffect, useRef, useState } from 'react';
-import { useCurrentTime } from '../../_store/useCurrentTime';
-import { usePeriod } from '../../_store/usePeriod';
+import { useEffect, useRef, useState } from 'react';
+import { CurrentTimeStatus, useCurrentTime } from '../../_store/useCurrentTime';
+import { Period, PeriodStatus, usePeriods } from '../../_store/usePeriods';
+
+/**
+ * Note: PeriodTimeline은 현재 교시에 따라 타임라인을 보여줍니다.
+ * 현재 교시를 알기 위해선 CurrentTime이 필수이므로, CurrentTime이 설정되기 전까진 Loading UI를 보여줍니다.
+ *
+ * 반응형에 따라 각 라벨의 표기가 바뀝니다.
+ * 어떤 반응형인지 구분하기 위해 window의 innerWidth를 비교하는 JS를 사용했으나,
+ * 미디어에 따라 CSS Variable을 두고 알아낼지,
+ * 미디어에 따라 객체를 바꿔줄지 고민 중
+ *    Ex.)
+ *      {isMobile && <MobildLabel />}
+ *      {isOverMobile && <DefaultLabel />}
+ *
+ * 따라오는 자식 컴포넌트와 헬퍼 함수가 많아서 아마 따로 폴더로 관리해야 할 듯 싶음.
+ */
 
 enum LabelType {
   SHORT,
@@ -60,25 +74,70 @@ const getNextDayAtFiveAM = (date: Date) => {
   return nextDay;
 };
 
-export const PeriodTimeline = () => {
-  /** Prop으로 받을 것(아마도): startTime, endTime, currentTime */
-  const { periods, currentPeriod } = usePeriod();
-  const { currentTime } = useCurrentTime();
+const getStartAndEndTime = ({
+  periods,
+  currentPeriod,
+  periodStatus,
+  currentTime,
+}: {
+  periods: Period[];
+  currentPeriod: Period | null;
+  periodStatus: PeriodStatus;
+  currentTime: Date;
+}) => {
+  const isBeforeFirstClass = periodStatus === PeriodStatus.BEFORE_FIRST_PERIOD;
+  const isAfterLastClass = periodStatus === PeriodStatus.AFTER_LAST_PERIOD;
+  const isInPeriod = periodStatus === PeriodStatus.IN_PERIOD;
 
-  let startTime = currentPeriod?.startTime || new Date('2024-05-04 13:00:00');
-  let endTime = addMinutes(currentPeriod?.startTime || new Date('2024-05-04 13:50:00'), currentPeriod?.duration || 10);
+  let startTime: Date = new Date();
+  let endTime: Date = new Date();
 
-  if (currentPeriod === -1) {
+  if (isBeforeFirstClass) {
     startTime = subMinutes(currentTime, getMinutes(currentTime));
     endTime = periods[0].startTime;
-  } else if (currentPeriod === 99) {
+  }
+
+  if (isAfterLastClass) {
     const lastPeriod = periods.at(-1)!;
 
     startTime = addMinutes(lastPeriod.startTime, lastPeriod.duration);
     endTime = getNextDayAtFiveAM(startTime);
   }
 
-  // const [currentTime, setCurrentTime] = useState(new Date('2024-05-03 13:30:00'));
+  if (isInPeriod) {
+    startTime = currentPeriod!.startTime;
+    endTime = addMinutes(currentPeriod!.startTime, currentPeriod!.duration);
+  }
+
+  return { startTime, endTime };
+};
+
+export const PeriodTimeline = () => {
+  const { status: currentTimeStatus } = useCurrentTime();
+
+  const hasNoCurrentTime = currentTimeStatus === CurrentTimeStatus.NOT_SET;
+
+  if (hasNoCurrentTime) {
+    return <div className="flex-1">Loading...</div>;
+  }
+
+  return <AwaitedPeriodTimeline />;
+};
+
+const AwaitedPeriodTimeline = () => {
+  const { status: periodStatus, periods, currentPeriod } = usePeriods();
+  const { status: currentTimeStatus, currentTime } = useCurrentTime();
+
+  if (currentTimeStatus === CurrentTimeStatus.NOT_SET) {
+    throw new Error("currentTimeStatus shouldn't be 'NOT_SET' at this point");
+  }
+
+  const { startTime, endTime } = getStartAndEndTime({
+    periods,
+    currentPeriod,
+    periodStatus,
+    currentTime,
+  });
 
   const [isOverMobileSize, setIsOverMobileSize] = useState(
     () => typeof window === 'object' && window.innerWidth >= 768
@@ -108,6 +167,7 @@ export const PeriodTimeline = () => {
   const doneCalcuateMargin = marginInterpolation !== 0;
 
   useEffect(() => {
+    /** TODO: Hook으로 분리하기(useMobileSize) */
     const calcuateMobileSize = () => {
       setIsOverMobileSize(window.innerWidth >= 768);
     };
@@ -116,24 +176,15 @@ export const PeriodTimeline = () => {
 
     window.addEventListener('resize', calcuateMobileSize);
 
-    /** 기능 테스트용 */
-    // const timerId = setInterval(() => {
-    //   setCurrentTime((prevData) => {
-    //     if (isSameMinute(prevData, endTime)) {
-    //       clearInterval(timerId);
-    //       return prevData;
-    //     }
-    //     return addMinutes(prevData, 1);
-    //   });
-    // }, 1000);
-
     return () => {
       window.removeEventListener('resize', calcuateMobileSize);
-      // clearInterval(timerId);
     };
   }, []);
 
   useEffect(() => {
+    /** 시각 라벨 표기에 따라 margin이 달라지므로 labelType에 따른 값를 설정
+     * TODO: Hook으로 분리하기 (useCalcuatedMargin)
+     */
     const calcuateMargin = () => {
       const milestone = document.querySelector('.milestone');
 
@@ -188,6 +239,10 @@ type DurationLabelProp = {
   label: string;
 };
 
+/**
+ * DurationLabel은 (1) 현재 진행 시간 (2) 남은 시간을 표시하는 컴포넌트
+ * 시간을 표기하기에 충분하지 않은 크기일 시 Hide 처리
+ */
 const DurationLabel = ({ label, timeRatio }: DurationLabelProp) => {
   const parentRef = useRef<HTMLDivElement>(null);
   const childRef = useRef<HTMLSpanElement>(null);
@@ -233,6 +288,12 @@ type TimeMilestoneProps = {
   isActive?: boolean;
 };
 
+/**
+ * 시작, 현재, 종료 시각을 표시하는 컴포넌트
+ *
+ * 반응형으로 시각을 표시하는 표기 분기
+ * Pointer를 사용하는 미디어 환경일 시 Hover 효과(Scale Up)
+ */
 const TimeMilestone = ({ milestoneLabel, order, timeLabel, isActive }: TimeMilestoneProps) => {
   const isDotToTime = order === TimeMilestoneOrder.DOT_TO_TIME;
   const isTimeToDot = order === TimeMilestoneOrder.TIME_TO_DOT;

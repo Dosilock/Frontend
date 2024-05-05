@@ -1,24 +1,40 @@
 'use client';
 
 import { useEffect } from 'react';
-import { useCurrentTime } from '../_store/useCurrentTime';
-import { Period, usePeriod } from '../_store/usePeriod';
+import { CurrentTimeStatus, useCurrentTime } from '../_store/useCurrentTime';
+import { Period, PeriodStatus, usePeriods } from '../_store/usePeriods';
 import { addMinutes } from 'date-fns';
 
 export const PeriodHandler = ({ timetable }: { timetable: Period[] }) => {
-  const { currentTime } = useCurrentTime();
-  const { updatePeriod, setPeriods } = usePeriod();
+  const { status: currentTimeStatus, currentTime } = useCurrentTime();
+  const { updatePeriod, setPeriods } = usePeriods();
 
   useEffect(() => {
     setPeriods(timetable);
-  }, []);
+  }, [timetable]);
 
   useEffect(() => {
-    const currentPeriod = getCurrentPeriod(timetable, currentTime);
+    if (currentTimeStatus === CurrentTimeStatus.NOT_SET) {
+      return;
+    }
 
-    console.log(currentPeriod);
+    const result = getCurrentPeriod(timetable, currentTime);
 
-    updatePeriod(currentPeriod);
+    const isBeforeFirstPeriod = result === PeriodStatus.BEFORE_FIRST_PERIOD;
+    const isAfterLastPeriod = result === PeriodStatus.AFTER_LAST_PERIOD;
+    const isInPeriod = !(isBeforeFirstPeriod || isAfterLastPeriod);
+
+    if (isBeforeFirstPeriod) {
+      updatePeriod(null, PeriodStatus.BEFORE_FIRST_PERIOD);
+    }
+
+    if (isAfterLastPeriod) {
+      updatePeriod(null, PeriodStatus.AFTER_LAST_PERIOD);
+    }
+
+    if (isInPeriod) {
+      updatePeriod(result, PeriodStatus.IN_PERIOD);
+    }
   }, [currentTime]);
 
   return <></>;
@@ -33,7 +49,7 @@ const getCurrentPeriod = (timetable: Period[], currentTime: Date) => {
   const isBeforeFirstPeriod = currentTime.getTime() < firstPeriod.startTime.getTime();
 
   if (isBeforeFirstPeriod) {
-    return -1;
+    return PeriodStatus.BEFORE_FIRST_PERIOD;
   }
 
   // (2) 시간표 종료 후인지 확인
@@ -41,7 +57,7 @@ const getCurrentPeriod = (timetable: Period[], currentTime: Date) => {
   const isAfterLastPeriod = currentTime.getTime() > addMinutes(lastPeriod.startTime, lastPeriod.duration - 1).getTime();
 
   if (isAfterLastPeriod) {
-    return 99;
+    return PeriodStatus.AFTER_LAST_PERIOD;
   }
 
   // (3) 시간표 시간 확인
@@ -53,7 +69,7 @@ const getCurrentPeriod = (timetable: Period[], currentTime: Date) => {
 
       return isInPeriod;
     })
-    .at(0);
+    .at(0)!;
 
   // matchPeriod가 []인 경우는 never
 

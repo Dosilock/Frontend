@@ -18,15 +18,21 @@ export type TimerEvent =
 
 let _timerId: NodeJS.Timeout | null = null;
 
-if (typeof window !== undefined) {
-  window.addEventListener('message', (event: MessageEvent<TimerEvent>) => {
+typeof self === 'object' &&
+  self.addEventListener('message', (event: MessageEvent<TimerEvent>) => {
     console.log('너 왜 일 안 해...');
     const { data: timerEvent } = event;
+
+    console.log(timerEvent.action, TimerEventAction.START_TIMER);
 
     const wouldStartTimer = timerEvent.action === TimerEventAction.START_TIMER;
 
     if (wouldStartTimer) {
       const { interval } = timerEvent.payload;
+
+      if (_timerId !== null) {
+        return;
+      }
 
       _timerId = setInterval(() => {
         postMessage(null);
@@ -39,4 +45,3 @@ if (typeof window !== undefined) {
       clearInterval(_timerId);
     }
   });
-}

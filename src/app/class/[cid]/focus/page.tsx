@@ -1,6 +1,7 @@
-import { Pause } from 'lucide-react';
+import { Expand, Pause } from 'lucide-react';
 import { PeriodTimeline } from './_components/PeriodTimeline';
 import { PeriodName } from './_components/PeriodName';
+import { FullScreenButton } from './_components/FullScreenButton';
 
 export default function Page() {
   return (
@@ -10,10 +11,6 @@ export default function Page() {
         className="flex-1 flex flex-col min-h-[calc(100dvh-9.5rem)] relative md:min-h-[calc(100dvh-14rem)] lg:min-h-[calc(100dvh-9.25rem)] bg-gray-50">
         <div className="flex-1 flex justify-center items-center">
           <PeriodName />
-          {/* <div>
-            <p className="text-[2.625rem] font-bold text-green-700">오후1</p>
-            <p className="text-lg font-semibold text-green-700 text-center">4시간</p>
-          </div> */}
         </div>
         <div className="flex-1 flex items-center justify-center">
           <button className="w-full text-[1.3125rem] flex flex-row gap-2 items-center justify-center py-3 bg-green-50 rounded shadow-focusBtn active:scale-95 transition-transform">
@@ -23,24 +20,18 @@ export default function Page() {
             </span>
           </button>
         </div>
+
         {/**
-         * NOTE: 나중에 d3로 하는 게 편할 것 같기도 하구
+         * NOTE: 나중에 canvas로 하는 게 편할 것 같기도 하구
          * 저.. marginInterpolation을 JS로 계산 안 하고 하는 방법이 없을까 싶네 ㅠ
          */}
         <div className="flex-1 flex items-center justify-center select-none">
           <PeriodTimeline />
         </div>
 
-        {/* <div className="absolute top-0 right-0">
-          <button
-            onClick={() => {
-              document.querySelector('#focusSection')!.requestFullscreen({
-                navigationUI: 'show',
-              });
-            }}>
-            <Expand />
-          </button>
-        </div> */}
+        <div className="absolute top-0 right-0">
+          <FullScreenButton />
+        </div>
       </div>
 
       <div className="lg:flex-1">
