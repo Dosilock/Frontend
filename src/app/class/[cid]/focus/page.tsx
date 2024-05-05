@@ -2,6 +2,7 @@ import { Expand, Pause } from 'lucide-react';
 import { PeriodTimeline } from './_components/PeriodTimeline';
 import { PeriodName } from './_components/PeriodName';
 import { FullScreenButton } from './_components/FullScreenButton';
+import { FocusButton } from './_components/FocusButton';
 
 export default function Page() {
   return (
@@ -13,12 +14,7 @@ export default function Page() {
           <PeriodName />
         </div>
         <div className="flex-1 flex items-center justify-center">
-          <button className="w-full text-[1.3125rem] flex flex-row gap-2 items-center justify-center py-3 bg-green-50 rounded shadow-focusBtn active:scale-95 transition-transform">
-            <Pause className="text-transparent fill-green-700" />
-            <span>
-              오늘 <strong className="text-green-700">56분 집중</strong>했어요.
-            </span>
-          </button>
+          <FocusButton />
         </div>
 
         {/**

@@ -118,10 +118,17 @@ export const PeriodTimeline = () => {
   const hasNoCurrentTime = currentTimeStatus === CurrentTimeStatus.NOT_SET;
 
   if (hasNoCurrentTime) {
-    return <div className="flex-1">Loading...</div>;
+    return (
+      <div className="flex-1">
+        <PeriodTimelineLoading />
+      </div>
+    );
   }
-
   return <AwaitedPeriodTimeline />;
+};
+
+const PeriodTimelineLoading = () => {
+  return <div className="h-4 animate-pulse bg-gray-200 rounded m-4" />;
 };
 
 const AwaitedPeriodTimeline = () => {
