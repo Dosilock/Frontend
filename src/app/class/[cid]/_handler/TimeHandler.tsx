@@ -3,9 +3,11 @@
 import { useEffect } from 'react';
 import { CurrentTimeStatus, useCurrentTime } from '../_store/useCurrentTime';
 import { TimerEvent, TimerEventAction } from '../_workers/timeWorker';
+import { FocusStatus, useFocusAction } from '../_store/useFocusAction';
 
 export const TimeHandler = ({ serverTime }: { serverTime: Date }) => {
-  const { status: currentTimeStatus, initializeTime, tick } = useCurrentTime();
+  const { status: currentTimeStatus, initializeTime, tick: currentTimeTick } = useCurrentTime();
+  const { status: focusStatus, tick: focusTimeTick } = useFocusAction();
 
   useEffect(() => {
     if (currentTimeStatus === CurrentTimeStatus.NOT_SET) {
@@ -14,9 +16,12 @@ export const TimeHandler = ({ serverTime }: { serverTime: Date }) => {
 
     const timerWorker = new Worker(new URL('../_workers/timeWorker.ts', import.meta.url), { type: 'module' });
 
-    timerWorker.addEventListener('message', () => {
-      tick();
-    });
+    const handleMessage = () => {
+      currentTimeTick();
+      focusTimeTick();
+    };
+
+    timerWorker.addEventListener('message', handleMessage.bind(this));
 
     const timerEvent: TimerEvent = {
       action: TimerEventAction.START_TIMER,
