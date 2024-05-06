@@ -1,24 +1,15 @@
+import { format, getHours, subDays } from 'date-fns';
 import { ChevronDown, School, Settings } from 'lucide-react';
 import { PropsWithChildren } from 'react';
-import { NavigationTabs } from './_components/NavigationTabs';
-import { TimeHandler } from './_handler/TimeHandler';
-import { PeriodHandler } from './_handler/PeriodHandler';
-import { Period } from './_store/usePeriods';
-import { getDay, getHours, getMonth, getYear, setDate, subDays, format } from 'date-fns';
 import { getServerTime, getTimetable } from './_actions/actions';
+import { NavigationTabs } from './_components/NavigationTabs';
+import { PeriodHandler } from './_handler/PeriodHandler';
+import { TimeHandler } from './_handler/TimeHandler';
+import { TimetableHandler } from './_handler/TimetableHandler';
 
 export default async function Layout({ children, params }: PropsWithChildren<{ params: { cid: string } }>) {
   const serverTime = await getServerTime();
   const timetable = await getTimetable();
-
-  const initialBaseTime =
-    getHours(serverTime) < 5 ? format(subDays(serverTime, 1), 'yyyy-MM-dd') : format(serverTime, 'yyyy-MM-dd');
-
-  /** 첫 교시가 05시에 시작하고 마지막 교시가 04에 끝나면,  .... 아 걍 5를 뺄까?*/
-  const initialPeriods = timetable.periods.map((period) => ({
-    ...period,
-    startTime: new Date(`${initialBaseTime} ${format(period.startTime, 'hh:mm:ss')}`),
-  }));
 
   return (
     <>
@@ -51,7 +42,8 @@ export default async function Layout({ children, params }: PropsWithChildren<{ p
       </section>
 
       <TimeHandler serverTime={serverTime} />
-      <PeriodHandler initialPeriods={initialPeriods} />
+      <TimetableHandler initialTimetable={timetable} />
+      <PeriodHandler />
     </>
   );
 }
