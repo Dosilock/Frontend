@@ -3,6 +3,8 @@ import { PropsWithChildren } from 'react';
 import { NavigationTabs } from './_components/NavigationTabs';
 import { TimeHandler } from './_handler/TimeHandler';
 import { PeriodHandler } from './_handler/PeriodHandler';
+import { Period } from './_store/usePeriods';
+import { getDay, getHours, getMonth, getYear, setDate, subDays, format } from 'date-fns';
 
 const requestEchoAPI = <T,>(result: T) => {
   return new Promise<T>((resolve) => {
@@ -13,12 +15,41 @@ const requestEchoAPI = <T,>(result: T) => {
   });
 };
 
-const _timetable = [
-  { id: 0, name: '오전1', startTime: new Date('2024-05-04 13:00:00'), duration: 50, isAttendacneRequired: false },
-  { id: 1, name: '쉬는 시간', startTime: new Date('2024-05-04 13:50:00'), duration: 10, isAttendacneRequired: false },
-  { id: 2, name: '오전2', startTime: new Date('2024-05-04 14:00:00'), duration: 50, isAttendacneRequired: false },
-  { id: 3, name: '쉬는 시간', startTime: new Date('2024-05-04 14:50:00'), duration: 10, isAttendacneRequired: false },
-];
+enum DayOfWeek {
+  MONDAY = 0,
+  TUESDAY = 1,
+  WEDNESDAY = 2,
+  THURSDAY = 3,
+  FRIDAY = 4,
+  SATURDAY = 5,
+  SUNDAY = 6,
+}
+
+type Timetable = {
+  name: string;
+  dayOfWeeks: DayOfWeek[];
+  periods: Period[];
+};
+
+const _timetable: Timetable = {
+  name: '열심히 살자',
+  dayOfWeeks: [
+    DayOfWeek.MONDAY,
+    DayOfWeek.TUESDAY,
+    DayOfWeek.WEDNESDAY,
+    DayOfWeek.THURSDAY,
+    DayOfWeek.FRIDAY,
+    DayOfWeek.SATURDAY,
+    DayOfWeek.SUNDAY,
+  ],
+  periods: [
+    { id: 0, name: '오전1', startTime: new Date('2024-05-04 09:00:00'), duration: 180, isAttendacneRequired: false },
+    { id: 1, name: '점심 시간', startTime: new Date('2024-05-04 12:00:00'), duration: 90, isAttendacneRequired: false },
+    { id: 2, name: '오후1', startTime: new Date('2024-05-04 13:30:00'), duration: 240, isAttendacneRequired: false },
+    { id: 3, name: '저녁 시간', startTime: new Date('2024-05-04 17:30:00'), duration: 90, isAttendacneRequired: false },
+    { id: 4, name: '오후2', startTime: new Date('2024-05-04 19:00:00'), duration: 240, isAttendacneRequired: false },
+  ],
+};
 
 export default async function Layout({ children, params }: PropsWithChildren<{ params: { cid: string } }>) {
   // const { cid } = params;
@@ -31,6 +62,15 @@ export default async function Layout({ children, params }: PropsWithChildren<{ p
 
   const serverTime = await getServerTime();
   const timetable = await getTimetable();
+
+  const initialBaseTime =
+    getHours(serverTime) < 5 ? format(subDays(serverTime, 1), 'yyyy-MM-dd') : format(serverTime, 'yyyy-MM-dd');
+
+  /** 첫 교시가 05시에 시작하고 마지막 교시가 04에 끝나면,  .... 아 걍 5를 뺄까?*/
+  const initialPeriods = timetable.periods.map((period) => ({
+    ...period,
+    startTime: new Date(`${initialBaseTime} ${format(period.startTime, 'hh:mm:ss')}`),
+  }));
 
   return (
     <>
@@ -63,7 +103,7 @@ export default async function Layout({ children, params }: PropsWithChildren<{ p
       </section>
 
       <TimeHandler serverTime={serverTime} />
-      <PeriodHandler timetable={timetable} />
+      <PeriodHandler initialPeriods={initialPeriods} />
     </>
   );
 }

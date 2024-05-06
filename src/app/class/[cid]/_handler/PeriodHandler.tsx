@@ -3,22 +3,56 @@
 import { useEffect } from 'react';
 import { CurrentTimeStatus, useCurrentTime } from '../_store/useCurrentTime';
 import { Period, PeriodStatus, usePeriods } from '../_store/usePeriods';
-import { addMinutes } from 'date-fns';
+import {
+  addDays,
+  addMinutes,
+  isSameDay,
+  isSameHour,
+  isSameMinute,
+  isSameSecond,
+  setHours,
+  setMilliseconds,
+  setMinutes,
+  setSeconds,
+} from 'date-fns';
+import { useFocusAction } from '../_store/useFocusAction';
 
-export const PeriodHandler = ({ timetable }: { timetable: Period[] }) => {
+export const PeriodHandler = ({ initialPeriods }: { initialPeriods: Period[] }) => {
   const { status: currentTimeStatus, currentTime } = useCurrentTime();
-  const { updatePeriod, setPeriods } = usePeriods();
+  const { periods, updatePeriod, setPeriods } = usePeriods();
+  const {resetDuration} = useFocusAction()
 
   useEffect(() => {
-    setPeriods(timetable);
-  }, [timetable]);
+    setPeriods(initialPeriods);
+  }, [initialPeriods]);
 
   useEffect(() => {
     if (currentTimeStatus === CurrentTimeStatus.NOT_SET) {
       return;
     }
 
-    const result = getCurrentPeriod(timetable, currentTime);
+    /** 새벽 5시 체크 */
+    const resetTime = setSeconds(setMinutes(setHours(currentTime, 5), 0), 0);
+
+    const isSameDays = isSameDay(resetTime, currentTime);
+    const isSameHours = isSameHour(resetTime, currentTime);
+    const isSameMinutes = isSameMinute(resetTime, currentTime);
+    const isSameSeconds = isSameSecond(resetTime, currentTime);
+
+    const isSameTime = isSameDays && isSameMinutes && isSameHours && isSameSeconds;
+
+    if (isSameTime) {
+      resetDuration();
+
+      return setPeriods(
+        periods.map((period) => ({
+          ...period,
+          startTime: addDays(period.startTime, 1),
+        }))
+      );
+    }
+
+    const result = getCurrentPeriod(periods, currentTime);
 
     const isBeforeFirstPeriod = result === PeriodStatus.BEFORE_FIRST_PERIOD;
     const isAfterLastPeriod = result === PeriodStatus.AFTER_LAST_PERIOD;

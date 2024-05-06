@@ -28,5 +28,6 @@ export const useCurrentTime = create<UseCurrentTimeReturn>((set) => ({
       status: CurrentTimeStatus.SET_WITH_SERVER_TIME,
       currentTime: serverTime,
     }),
-  tick: () => set(({ currentTime: prevTime }) => ({ currentTime: addMinutes(prevTime!, 1) })),
+  tick: () => set(({ currentTime: prevTime }) => ({ currentTime: addSeconds(prevTime!, 1) })),
+  // tick: () => set(({ currentTime: prevTime }) => ({ currentTime: addMinutes(prevTime!, 1) })),
 }));
