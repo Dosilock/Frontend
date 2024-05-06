@@ -12,7 +12,7 @@ export enum FocusStatus {
  * 그러보고니 집중 시간은 만약 브라우저를 다시 껐다가 켜도 유지가 되어야 하네.
  * 이 부분은 localStorage로 저장
  */
-type UseFocusActionReturn = {
+type FocusTimeStoreReturn = {
   status: FocusStatus;
   duration: number; // seconds
 
@@ -22,7 +22,7 @@ type UseFocusActionReturn = {
   tick: () => void;
 };
 
-export const useFocusAction = create<UseFocusActionReturn>((set) => ({
+export const FocusTimeStore = create<FocusTimeStoreReturn>((set) => ({
   status: FocusStatus.NOT_FOCUSING,
   duration: typeof localStorage === 'undefined' ? 0 : Number(localStorage.getItem('focus-duration')) || 0,
 
@@ -39,3 +39,5 @@ export const useFocusAction = create<UseFocusActionReturn>((set) => ({
       return { duration: state.duration };
     }),
 }));
+
+export const useFocusTime = FocusTimeStore;
