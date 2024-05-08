@@ -1,27 +1,14 @@
-## PR TYPE
+### 어떤 PR 내용인가요?
+> `close #이슈번호 문제내용` 과 같은 형식으로 작성해주세요.
 
-- [ ] 새로운 기능 추가
-- [ ] 환경설정 변경
-- [ ] 버그 픽스
-- [ ] 리펙토링 (no functional changes, no api changes)
-- [ ] 코드 스타일 수정 (formatting, local variables)
-- [ ] CI 관련사항 변경
-- [ ] 문서 내용 변경
-- [ ] 그외
+- close #1 필요한 Template 작성
 
-## Related Issues
+### 어떤 부분이 변경됐나요?
+> 어떤 부분을 변경했는지, 무슨 이유로 코드를 변경했는지 설명해주세요.
 
-#1
+- Task 및 Bug와 관련된 Issue Template 작성
 
-## Ticket Number
+### 추가 정보 (선택)
+> 리뷰어가 특별히 봐주었으면 하는 부분이 있다면 작성해주세요.
 
-GONG-01
-
-## work detail
-
-- [ ] 상세 업무 내용
-
-## Other information
-
-- 주의 사항
-- 리뷰어에게 전달하고 싶은 메세지 등
+- 해당 없음
