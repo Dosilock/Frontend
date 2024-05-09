@@ -27,7 +27,6 @@ export const FocusTimeStore = create<FocusTimeStoreReturn>((set) => ({
   duration: typeof localStorage === 'undefined' ? 0 : Number(localStorage.getItem('focus-duration')) || 0,
 
   resetDuration: () => set({ duration: 0 }),
-
   startFocuing: () => set({ status: FocusStatus.FOCUSING }),
   stopFocusing: () => set({ status: FocusStatus.NOT_FOCUSING }),
   tick: () =>

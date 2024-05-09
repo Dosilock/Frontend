@@ -1,4 +1,36 @@
 #!/usr/bin/env sh
 . "$(dirname -- "$0")/_/husky.sh"
 
-pnpm jira-prepare-commit-msg $1
+# 현재 브랜치 이름 추출
+local_branch_name="$(git rev-parse --abbrev-ref HEAD)"
+
+# {issue_number}-{title}에 맞는 형식인가?
+if [[ $local_branch_name =~ ^([0-9]+)-.* ]]; then
+  # issue_number 구하기
+  issue_number="${BASH_REMATCH[1]}"
+
+  # Commit message 추출
+  COMMIT_MSG_FILE=$1
+  COMMIT_MSG=$(cat $COMMIT_MSG_FILE)
+
+  # Commit message가 여러 줄인 경우 처리
+  # 첫 번째 줄 추출
+  first_line=$(echo "$COMMIT_MSG" | head -n 1)
+  # 나머지 줄 추출
+  rest=$(echo "$COMMIT_MSG" | tail -n +2)
+
+  # 첫 번째 줄에 이슈 번호 추가
+  modified_first_line="${first_line} (#${issue_number})"
+
+  # 수정된 첫 번째 줄과 나머지를 합침
+  if [ -z "$rest" ]; then
+    # 나머지 줄이 없는 경우
+    echo "$modified_first_line" > $COMMIT_MSG_FILE
+  else
+    # 나머지 줄이 있는 경우
+    (echo "$modified_first_line"; echo "$rest") > $COMMIT_MSG_FILE
+  fi
+else
+  echo "ERROR: 브랜치 이름이 형식에 맞지 않아요. (예: {issue_number}-{title})"
+  exit 1
+fi
