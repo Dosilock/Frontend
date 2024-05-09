@@ -30,7 +30,6 @@ if [[ $local_branch_name =~ ^([0-9]+)-.* ]]; then
     # 나머지 줄이 있는 경우
     (echo "$modified_first_line"; echo "$rest") > $COMMIT_MSG_FILE
   fi
-else
-  echo "ERROR: 브랜치 이름이 형식에 맞지 않아요. (예: {issue_number}-{title})"
-  exit 1
 fi
+
+# {issue_number}-{title}에 안 맞으면 그냥 커밋 진행
