@@ -1,4 +1,20 @@
 #!/usr/bin/env sh
 . "$(dirname -- "$0")/_/husky.sh"
 
-pnpm jira-prepare-commit-msg $1
+# 현재 브런치 이름 추출
+local_branch_name="$(git rev-parse --abbrev-ref HEAD)"
+
+# {issue_number}-{title}에 맞는 형식인가?
+if [[ $local_branch_name =~ ^([0-9]+)-.* ]]; then
+  # issue_number 구하기
+  issue_number="${BASH_REMATCH[1]}"
+
+  # Commit message 추출
+  COMMIT_MSG_FILE=$1
+  COMMIT_MSG=$(cat $COMMIT_MSG_FILE)
+  
+  echo "${COMMIT_MSG} (#${issue_number})" > $COMMIT_MSG_FILE
+else
+  echo "ERROR: 브랜치 이름이 형식에 맞지 않아요. (예: {issue_number}-{title})"
+  exit 1
+fi
