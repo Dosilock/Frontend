@@ -1,5 +1,4 @@
 import { create } from 'zustand';
-import { devtools } from 'zustand/middleware';
 
 export type Period = {
   id: number;
@@ -38,69 +37,67 @@ type PeriodsStoreReturn =
       periods: Period[];
     } & PeriodsStoreReturnBase);
 
-export const PeriodsStore = create<PeriodsStoreReturn>()(
-  devtools((set) => ({
-    status: PeriodStatus.NOT_PERIODS_SET,
-    currentPeriod: null,
-    periods: null,
+export const PeriodsStore = create<PeriodsStoreReturn>((set) => ({
+  status: PeriodStatus.NOT_PERIODS_SET,
+  currentPeriod: null,
+  periods: null,
 
-    initializePeriodsStore: (periods, status, currentPeriod) => {
-      const isBeforeFirstPeriod = status === PeriodStatus.BEFORE_FIRST_PERIOD;
-      const isAfterLastPeriod = status === PeriodStatus.AFTER_LAST_PERIOD;
-      const isInPeriod = status === PeriodStatus.IN_PERIOD;
+  initializePeriodsStore: (periods, status, currentPeriod) => {
+    const isBeforeFirstPeriod = status === PeriodStatus.BEFORE_FIRST_PERIOD;
+    const isAfterLastPeriod = status === PeriodStatus.AFTER_LAST_PERIOD;
+    const isInPeriod = status === PeriodStatus.IN_PERIOD;
 
-      if (isBeforeFirstPeriod) {
-        return set({
-          status: PeriodStatus.BEFORE_FIRST_PERIOD,
-          currentPeriod: null,
-          periods,
-        });
-      }
+    if (isBeforeFirstPeriod) {
+      return set({
+        status: PeriodStatus.BEFORE_FIRST_PERIOD,
+        currentPeriod: null,
+        periods,
+      });
+    }
 
-      if (isAfterLastPeriod) {
-        return set({
-          status: PeriodStatus.AFTER_LAST_PERIOD,
-          currentPeriod: null,
-          periods,
-        });
-      }
+    if (isAfterLastPeriod) {
+      return set({
+        status: PeriodStatus.AFTER_LAST_PERIOD,
+        currentPeriod: null,
+        periods,
+      });
+    }
 
-      if (isInPeriod) {
-        return set({
-          status: PeriodStatus.IN_PERIOD,
-          currentPeriod: currentPeriod!,
-          periods,
-        });
-      }
-    },
+    if (isInPeriod) {
+      return set({
+        status: PeriodStatus.IN_PERIOD,
+        currentPeriod: currentPeriod!,
+        periods,
+      });
+    }
+  },
 
-    updatePeriod: (newPeriod: Period | null, status: PeriodStatus) => {
-      const isBeforeFirstPeriod = status === PeriodStatus.BEFORE_FIRST_PERIOD;
-      const isAfterLastPeriod = status === PeriodStatus.AFTER_LAST_PERIOD;
-      const isInPeriod = status === PeriodStatus.IN_PERIOD;
+  updatePeriod: (newPeriod: Period | null, status: PeriodStatus) => {
+    const isBeforeFirstPeriod = status === PeriodStatus.BEFORE_FIRST_PERIOD;
+    const isAfterLastPeriod = status === PeriodStatus.AFTER_LAST_PERIOD;
+    const isInPeriod = status === PeriodStatus.IN_PERIOD;
 
-      if (isBeforeFirstPeriod) {
-        return set({
-          status: PeriodStatus.BEFORE_FIRST_PERIOD,
-          currentPeriod: null,
-        });
-      }
+    if (isBeforeFirstPeriod) {
+      return set({
+        status: PeriodStatus.BEFORE_FIRST_PERIOD,
+        currentPeriod: null,
+      });
+    }
 
-      if (isAfterLastPeriod) {
-        return set({
-          status: PeriodStatus.AFTER_LAST_PERIOD,
-          currentPeriod: null,
-        });
-      }
+    if (isAfterLastPeriod) {
+      return set({
+        status: PeriodStatus.AFTER_LAST_PERIOD,
+        currentPeriod: null,
+      });
+    }
 
-      if (isInPeriod) {
-        return set({
-          status: PeriodStatus.IN_PERIOD,
-          currentPeriod: newPeriod as Period,
-        });
-      }
-    },
-  }))
-);
+    if (isInPeriod) {
+      return set({
+        status: PeriodStatus.IN_PERIOD,
+        currentPeriod: newPeriod as Period,
+      });
+    }
+  },
+}));
 
 export const usePeriods = PeriodsStore;
