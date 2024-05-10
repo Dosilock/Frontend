@@ -1,6 +1,5 @@
-import { addMinutes, addSeconds } from 'date-fns';
+import { addSeconds } from 'date-fns';
 import { create } from 'zustand';
-import { devtools, persist } from 'zustand/middleware';
 
 export enum CurrentTimeStatus {
   NOT_SET,
