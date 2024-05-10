@@ -9,8 +9,8 @@ export const SectionCard = ({ title, description, children }: PropsWithChildren<
   const hasDescription = description;
 
   return (
-    <section>
-      <div className="p-6 border border-gray-200 rounded text-green-900 space-y-2">
+    <section className="p-6 border border-gray-200 rounded text-green-900 space-y-6">
+      <div className="space-y-2">
         <h3 className="text-2xl lg:text-xl font-semibold">{title}</h3>
         {hasDescription && <p className="text-green-900">{description}</p>}
       </div>
