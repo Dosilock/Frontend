@@ -52,3 +52,43 @@ const _timetable: TimetableResponse = {
 
 export const getServerTime = async () => requestEchoAPI(new Date('2024-05-07 04:45:00'));
 export const getTimetable = async () => requestEchoAPI(_timetable);
+
+/**
+ * Note: 해당 더미 데이터는 오로지 화면 구성만 위한 데이터임.
+ * 실제로 실시간으로 집중 시간을 주고 받을 때는 다른 방식일 것.
+ */
+export type RankItem = {
+  id: number;
+  name: string;
+  focusTime: number;
+  isFocusing: boolean;
+};
+
+const _rankingList: RankItem[] = [
+  {
+    id: 1, // UserId
+    name: '황영웅',
+    focusTime: 3600 * 1 + 60 * 14 + 4, // Seconds
+    isFocusing: false,
+  },
+  {
+    id: 2, // UserId
+    name: '곽민지',
+    focusTime: 3600 * 1, // Seconds
+    isFocusing: true,
+  },
+  {
+    id: 3, // UserId
+    name: '권동휘',
+    focusTime: 60 * 58 + 15, // Seconds
+    isFocusing: true,
+  },
+  {
+    id: 4, // UserId
+    name: '김주현',
+    focusTime: 60 * 1 + 4, // Seconds
+    isFocusing: false,
+  },
+];
+
+export const getFocusRanking = async () => requestEchoAPI(_rankingList);
