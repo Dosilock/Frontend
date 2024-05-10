@@ -60,32 +60,39 @@ export const getTimetable = async () => requestEchoAPI(_timetable);
 export type RankItem = {
   id: number;
   name: string;
+  profileURL: string;
   focusTime: number;
   isFocusing: boolean;
 };
+
+import fox from '@/static/images/fox.jpg';
 
 const _rankingList: RankItem[] = [
   {
     id: 1, // UserId
     name: '황영웅',
+    profileURL: fox.src,
     focusTime: 3600 * 1 + 60 * 14 + 4, // Seconds
     isFocusing: false,
   },
   {
     id: 2, // UserId
     name: '곽민지',
+    profileURL: fox.src,
     focusTime: 3600 * 1, // Seconds
     isFocusing: true,
   },
   {
     id: 3, // UserId
     name: '권동휘',
+    profileURL: fox.src,
     focusTime: 60 * 58 + 15, // Seconds
     isFocusing: true,
   },
   {
     id: 4, // UserId
     name: '김주현',
+    profileURL: fox.src,
     focusTime: 60 * 1 + 4, // Seconds
     isFocusing: false,
   },
