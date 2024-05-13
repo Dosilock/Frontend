@@ -25,9 +25,10 @@ const initialValues: ResetPasswordRequest = {
 
 type ResetPasswordFormProps = {
   onSuccess: () => void;
+  email: string;
 };
 
-export default function ResetPasswordForm({ onSuccess }: ResetPasswordFormProps) {
+export default function ResetPasswordForm({ onSuccess, email }: ResetPasswordFormProps) {
   const [isPending, startTransition] = useTransition();
 
   const [state, setState] = useState<FormState>({
@@ -51,6 +52,9 @@ export default function ResetPasswordForm({ onSuccess }: ResetPasswordFormProps)
     }
 
     const formData = new FormData(formRef.current);
+
+    // input hidden 대신 email 값을 formData에 포함시켰어요.
+    formData.append('email', email);
 
     setState({
       status: ActionStatus.Idle,

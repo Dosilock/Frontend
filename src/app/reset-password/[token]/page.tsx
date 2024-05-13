@@ -3,8 +3,11 @@ import Link from 'next/link';
 import ResetPasswordForm from '../_forms/ResetPasswordForm';
 import { HeadingWithDescription } from '@/components/HeadingWithDescription/HeadingWithDescription';
 import { redirect } from 'next/navigation';
+import { requestTokenValidation } from './_actions/actions';
 
-export default function Page() {
+export default async function Page({ params: { token } }: { params: { token: string } }) {
+  const { email } = await requestTokenValidation(token);
+
   const handleSuccess = async () => {
     'use server';
 
@@ -21,7 +24,7 @@ export default function Page() {
 
       <HeadingWithDescription heading="비밀번호 재설정" description="변경할 비밀번호를 입력해주세요." />
 
-      <ResetPasswordForm onSuccess={handleSuccess} />
+      <ResetPasswordForm onSuccess={handleSuccess} email={email} />
     </section>
   );
 }
