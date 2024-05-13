@@ -11,10 +11,26 @@ import { Control, useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { resetPassword } from './ResetPasswordForm.action';
 
-const formSchema = z.object({
-  password: z.string(),
-  passwordConfirm: z.string(),
-});
+const passwordRegex = new RegExp(/^(?=.*[a-zA-Z])(?=.*[!@#$%^*+=-])(?=.*[0-9]).{8,15}$/);
+
+const formSchema = z
+  .object({
+    password: z
+      .string()
+      .min(8, { message: '비밀번호는 최소 8자 이상이어야 합니다.' })
+      .max(15, { message: '비밀번호는 최대 15자 이내이어야 합니다.' })
+      .regex(passwordRegex, { message: '영문, 숫자, 특수문자를 모두 포함해서 입력해주쇼.' }),
+    passwordConfirm: z.string(),
+  })
+  .superRefine(({ password, passwordConfirm }, ctx) => {
+    if (password !== passwordConfirm) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: '비밀번호가 일치하지 않네요.',
+        path: ['passwordConfirm'],
+      });
+    }
+  });
 
 export type ResetPasswordRequest = z.infer<typeof formSchema>;
 
