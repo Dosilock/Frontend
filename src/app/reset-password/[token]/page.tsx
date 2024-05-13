@@ -6,7 +6,8 @@ import { redirect } from 'next/navigation';
 import { requestTokenValidation } from './_actions/actions';
 
 export default async function Page({ params: { token } }: { params: { token: string } }) {
-  const { email } = await requestTokenValidation(token);
+  const response = await requestTokenValidation(token);
+  const { email } = await response.fields;
 
   const handleSuccess = async () => {
     'use server';

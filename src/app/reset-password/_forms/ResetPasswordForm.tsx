@@ -19,7 +19,7 @@ const formSchema = z
       .string()
       .min(8, { message: '비밀번호는 최소 8자 이상이어야 합니다.' })
       .max(15, { message: '비밀번호는 최대 15자 이내이어야 합니다.' })
-      .regex(passwordRegex, { message: '영문, 숫자, 특수문자를 모두 포함해서 입력해주쇼.' }),
+      .regex(passwordRegex, { message: '영문, 숫자, 특수문자 포함해서 머시기해라.' }),
     passwordConfirm: z.string(),
   })
   .superRefine(({ password, passwordConfirm }, ctx) => {
