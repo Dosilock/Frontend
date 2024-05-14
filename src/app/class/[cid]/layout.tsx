@@ -6,6 +6,7 @@ import { NavigationTabs } from './_components/NavigationTabs';
 import { PeriodHandler } from './_handler/PeriodHandler';
 import { TimeHandler } from './_handler/TimeHandler';
 import { TimetableHandler } from './_handler/TimetableHandler';
+import { SocketHandler } from './_handler/SocketHandler';
 
 export default async function Layout({ children, params }: PropsWithChildren<{ params: { cid: string } }>) {
   const serverTime = await getServerTime();
@@ -44,6 +45,7 @@ export default async function Layout({ children, params }: PropsWithChildren<{ p
       <TimeHandler serverTime={serverTime} />
       <TimetableHandler initialTimetable={timetable} />
       <PeriodHandler />
+      <SocketHandler />
     </>
   );
 }
