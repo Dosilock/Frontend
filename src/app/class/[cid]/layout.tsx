@@ -9,8 +9,19 @@ import { TimetableHandler } from './_handler/TimetableHandler';
 import { SocketHandler } from './_handler/SocketHandler';
 
 export default async function Layout({ children, params }: PropsWithChildren<{ params: { cid: string } }>) {
-  const serverTime = await getServerTime();
-  const timetable = await getTimetable();
+  const { status: serverTimeStatus, payload: serverTimePayload } = await getServerTime();
+  const { status: timetableStatus, payload: timetablePayload } = await getTimetable();
+
+  if (serverTimeStatus === 500) {
+    throw new Error('serverTimeStatus: 500');
+  }
+
+  if (timetableStatus === 500) {
+    throw new Error('timetableStatus: 500');
+  }
+
+  const { serverTime } = serverTimePayload;
+  const { timetable } = timetablePayload;
 
   return (
     <>

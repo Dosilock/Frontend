@@ -8,12 +8,18 @@ import { TopRank, TopRankItem } from './TopRankItem';
  */
 
 export const FocusRandking = async () => {
-  const rankList = await getFocusRanking();
+  const { status, payload } = await getFocusRanking();
+
+  if (status === 500) {
+    throw new Error('focusRanking 500');
+  }
+
+  const { rankingList } = payload;
 
   return (
     <div className="space-y-6">
-      <TopRankList topRanks={rankList.slice(0, 3)} />
-      <RankTable ranks={rankList} />
+      <TopRankList topRanks={rankingList.slice(0, 3)} />
+      <RankTable ranks={rankingList} />
     </div>
   );
 };

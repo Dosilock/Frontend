@@ -1,15 +1,7 @@
 'use server';
 
+import { _withSuccess, requestEchoAPI } from '@/utils/apiHelper';
 import { DayOfWeek } from '../_store/TimetableStore';
-
-const requestEchoAPI = <T>(result: T) => {
-  return new Promise<T>((resolve) => {
-    const timerId = setTimeout(() => {
-      resolve(result);
-      clearTimeout(timerId);
-    }, 1500);
-  });
-};
 
 export type TimetableResponse = {
   name: string;
@@ -50,8 +42,17 @@ const _timetable: TimetableResponse = {
   ],
 };
 
-export const getServerTime = async () => requestEchoAPI(new Date('2024-05-07 04:45:00'));
-export const getTimetable = async () => requestEchoAPI(_timetable);
+type GetServerTimeResponse = {
+  serverTime: Date;
+};
+
+export const getServerTime = async () =>
+  requestEchoAPI(_withSuccess({ serverTime: new Date('2024-05-07 04:45:00') } as GetServerTimeResponse));
+
+type GetTimetableResponse = {
+  timetable: TimetableResponse;
+};
+export const getTimetable = async () => requestEchoAPI(_withSuccess({ timetable: _timetable } as GetTimetableResponse));
 
 /**
  * Note: 해당 더미 데이터는 오로지 화면 구성만 위한 데이터임.
@@ -98,4 +99,9 @@ const _rankingList: RankItem[] = [
   },
 ];
 
-export const getFocusRanking = async () => requestEchoAPI(_rankingList);
+type GetFocusRankingResponse = {
+  rankingList: RankItem[];
+};
+
+export const getFocusRanking = async () =>
+  requestEchoAPI(_withSuccess({ rankingList: _rankingList } as GetFocusRankingResponse));
