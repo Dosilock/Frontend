@@ -3,7 +3,7 @@ import * as React from 'react';
 import { KeyRoundIcon, Mail } from 'lucide-react';
 
 export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
-  iconType: 'email' | 'password';
+  iconType?: 'email' | 'password';
 }
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(({ className, type, ...props }, ref) => {
