@@ -20,6 +20,7 @@ const MAX_UPLOAD_SIZE = 1024 * 1024 * 3; // 3MB
 const ACCEPTED_FILE_TYPES = ['image/png'];
 
 const formSchema = z.object({
+  email: z.string(),
   username: z.string().min(2, {
     message: '이름은 최소 2글자 이상',
   }),
@@ -37,21 +38,23 @@ const formSchema = z.object({
 export type SignUpRequest = z.infer<typeof formSchema>;
 
 const initialValues: SignUpRequest = {
+  email: '',
   username: '',
   // profileImage: undefined,
 };
 
 type SignUpFormProp = {
+  defaultValues: { email: string };
   onSuccess: () => void;
 };
 
-export function SignUpForm({ onSuccess }: SignUpFormProp) {
+export function SignUpForm({ onSuccess, defaultValues }: SignUpFormProp) {
   const [isPending, startTransition] = useTransition();
   const formRef = useRef<HTMLFormElement>(null);
 
   const [state, setState] = useState<FormState>({
     status: ActionStatus.Idle,
-    fields: { ...initialValues },
+    fields: { ...initialValues, ...defaultValues },
   });
 
   const form = useForm<SignUpRequest>({
@@ -97,6 +100,7 @@ export function SignUpForm({ onSuccess }: SignUpFormProp) {
         className="w-full flex-1 flex"
         encType="multipart/form-data">
         <fieldset className="flex-1 flex flex-col border-none space-y-6" disabled={isPending}>
+          <EmailField control={form.control} />
           <UsernameField control={form.control} />
           {/* <ProfileField control={form.control} /> */}
           {hasError && <p>{state.issues[0]}</p>}
@@ -106,6 +110,25 @@ export function SignUpForm({ onSuccess }: SignUpFormProp) {
     </Form>
   );
 }
+
+const EmailField = ({ control }: { control: Control<SignUpRequest, any> }) => {
+  return (
+    <FormField
+      control={control}
+      name="email"
+      render={({ field }) => (
+        <FormItem>
+          <FormLabel>이메일*</FormLabel>
+          <FormDescription>해당 이메일로 가입될 예정입니다.</FormDescription>
+          <FormControl>
+            <Input type="email" {...field} disabled />
+          </FormControl>
+          <FormMessage />
+        </FormItem>
+      )}
+    />
+  );
+};
 
 const UsernameField = ({ control }: { control: Control<SignUpRequest, any> }) => {
   return (
