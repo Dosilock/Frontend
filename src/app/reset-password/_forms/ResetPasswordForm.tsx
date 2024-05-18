@@ -11,10 +11,26 @@ import { Control, useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { resetPassword } from './ResetPasswordForm.action';
 
-const formSchema = z.object({
-  password: z.string(),
-  passwordConfirm: z.string(),
-});
+const passwordRegex = new RegExp(/^(?=.*[a-zA-Z])(?=.*[!@#$%^*+=-])(?=.*[0-9]).{8,15}$/);
+
+const formSchema = z
+  .object({
+    password: z
+      .string()
+      .min(8, { message: '비밀번호는 최소 8자 이상이어야 합니다.' })
+      .max(15, { message: '비밀번호는 최대 15자 이내이어야 합니다.' })
+      .regex(passwordRegex, { message: '영문, 숫자, 특수문자 포함해서 머시기해라.' }),
+    passwordConfirm: z.string(),
+  })
+  .superRefine(({ password, passwordConfirm }, ctx) => {
+    if (password !== passwordConfirm) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: '비밀번호가 일치하지 않네요.',
+        path: ['passwordConfirm'],
+      });
+    }
+  });
 
 export type ResetPasswordRequest = z.infer<typeof formSchema>;
 
@@ -25,9 +41,10 @@ const initialValues: ResetPasswordRequest = {
 
 type ResetPasswordFormProps = {
   onSuccess: () => void;
+  email: string;
 };
 
-export default function ResetPasswordForm({ onSuccess }: ResetPasswordFormProps) {
+export default function ResetPasswordForm({ onSuccess, email }: ResetPasswordFormProps) {
   const [isPending, startTransition] = useTransition();
 
   const [state, setState] = useState<FormState>({
@@ -51,6 +68,9 @@ export default function ResetPasswordForm({ onSuccess }: ResetPasswordFormProps)
     }
 
     const formData = new FormData(formRef.current);
+
+    // input hidden 대신 email 값을 formData에 포함시켰어요.
+    formData.append('email', email);
 
     setState({
       status: ActionStatus.Idle,

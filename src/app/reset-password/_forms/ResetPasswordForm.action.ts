@@ -11,6 +11,14 @@ export async function resetPassword(prevState: FormState, data: FormData): Promi
     setTimeout(() => resolve(null), 1500);
   });
 
+  // const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/password/confirm`, {
+  //   method: 'POST',
+  //   headers: {
+  //     'Content-Type': 'application/json',
+  //   },
+  //   body: JSON.stringify(Object.fromEntries(data)),
+  // });
+
   // return { status: ActionStatus.Error, issues: ['에러여 에러'] };
   return { status: ActionStatus.Success, fields: Object.fromEntries(data) as Record<string, string> };
 }
