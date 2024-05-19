@@ -8,6 +8,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { PropsWithChildren, useRef } from 'react';
 import { Control, useForm } from 'react-hook-form';
 import { z } from 'zod';
+import { CreateFormSchema } from '../page';
 
 const formSchema = z.object({
   name: z.string().min(2, '반 이름은 최소 2글자 이상이어야 해요.').max(50, '반 이름은 최대 50글자 이하여야 해요.'),
@@ -15,38 +16,27 @@ const formSchema = z.object({
   description: z.string().optional(),
 });
 
-export type RequiredRequest = z.infer<typeof formSchema>;
-
-const initialValues: RequiredRequest = {
-  name: '',
-  emoji: '😇',
-  description: '',
-};
-
+export type RequiredRequest = Pick<CreateFormSchema, 'name' | 'emoji' | 'description'>;
+// export type RequiredRequest = z.infer<typeof formSchema>;
 type RequiredFormProp = {
+  defaultValues: RequiredRequest;
   onSuccess: (data: RequiredRequest) => void;
 };
 
-export function RequiredForm({ onSuccess }: RequiredFormProp) {
-  const formRef = useRef<HTMLFormElement>(null);
-
+export function RequiredForm({ defaultValues, onSuccess }: RequiredFormProp) {
   const form = useForm<RequiredRequest>({
     resolver: zodResolver(formSchema),
-    defaultValues: { ...initialValues },
+    defaultValues: { ...defaultValues },
   });
 
   const handleSubmitAfterValidation = (data: RequiredRequest) => {
-    if (formRef.current === null) {
-      throw new Error('formRef가 없음');
-    }
-
     console.log({ data });
     onSuccess(data);
   };
 
   return (
     <Form {...form}>
-      <form className="w-full flex-1 flex" ref={formRef} onSubmit={form.handleSubmit(handleSubmitAfterValidation)}>
+      <form className="w-full flex-1 flex" onSubmit={form.handleSubmit(handleSubmitAfterValidation)}>
         <fieldset className="flex flex-col border-none space-y-2 md:space-y-6 flex-1 w-full">
           <ClassNameField control={form.control} />
           {/* TODO: Emoji Picker로 변경 */}
@@ -108,7 +98,6 @@ const ClassDescriptionField = ({ control }: { control: Control<RequiredRequest, 
           <FormLabel>반 설명</FormLabel>
           <FormDescription>반에 대해서 설명해보쇼.</FormDescription>
           <FormControl>
-            {/* <Input placeholder="example@example.com" type="email" {...field} /> */}
             <Textarea placeholder="나태함은 곧 죽음이오." {...field} />
           </FormControl>
           <FormMessage />

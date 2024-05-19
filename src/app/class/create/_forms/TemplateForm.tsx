@@ -5,6 +5,9 @@ import { cn } from '@/lib/utils';
 import Image from 'next/image';
 import { useState } from 'react';
 
+import fox from '@/static/images/fox.jpg';
+import { CreateFormSchema } from '../page';
+
 // TODO: types/model로 분리
 export type TemplateData = {
   id: number;
@@ -13,23 +16,47 @@ export type TemplateData = {
   image: string;
 };
 
+const templateDataList: TemplateData[] = [
+  {
+    id: 0,
+    name: '수능 시간표',
+    description: '수능 시간표에 대한 설명입니다.',
+    image: fox.src,
+  },
+  {
+    id: 1,
+    name: '한국사 시간표',
+    description: '한국사 시간표에 대한 설명입니다.',
+    image: fox.src,
+  },
+  {
+    id: 2,
+    name: '빈 시간표',
+    description: '시간표를 직접 설정할게요.',
+    image: fox.src,
+  },
+];
+
 type TemplateFormProp = {
-  list: TemplateData[];
-  onSuccess: (selectedId: number) => void;
+  defaultValues: Pick<CreateFormSchema, 'templateId'>;
+  onSuccess: (data: Pick<CreateFormSchema, 'templateId'>) => void;
 };
 
-export default function TemplateForm({ list, onSuccess }: TemplateFormProp) {
-  const [selectedId, setSelectedId] = useState(0);
+export function TemplateForm({ defaultValues, onSuccess }: TemplateFormProp) {
+  const [selectedId, setSelectedId] = useState(defaultValues.templateId);
 
   return (
     <section className="w-full flex-1 flex flex-col gap-3">
       <div>
         <h4 className="font-bold mb-3">템플릿 목록</h4>
-        <TemplateList list={list} selectedId={selectedId} onSelect={(id) => setSelectedId(id)} />
+        <TemplateList list={templateDataList} selectedId={selectedId} onSelect={(id) => setSelectedId(id)} />
       </div>
 
       <div className="flex-1 flex flex-col justify-end">
-        <Button type="button" className="w-full rounded-full" onClick={() => onSuccess(selectedId)}>
+        <Button
+          type="button"
+          className="w-full rounded-full"
+          onClick={() => onSuccess({ templateId: selectedId } as Pick<CreateFormSchema, 'templateId'>)}>
           다음
         </Button>
       </div>
