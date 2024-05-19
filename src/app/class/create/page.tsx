@@ -123,23 +123,25 @@ export default function Page() {
   const router = useRouter();
 
   const [formDataForSubmit, setFormDataForSubmit] = useState(initialFormData);
-  const [currentStepInfo, setCurrentStepInfo] = useState<StepInfo>(createStepInfo[2]);
-  const lastStep = useRef(currentStepInfo.stepId);
+  const [currentStepId, setCurrentStepId] = useState<CreateStep>(CreateStep.REQUIRED);
 
-  const isRequiredStep = currentStepInfo.stepId === CreateStep.REQUIRED;
-  const isTemplateStep = currentStepInfo.stepId === CreateStep.TEMPLATE;
-  const isTimetableStep = currentStepInfo.stepId === CreateStep.TIMETABLE;
-  const isTimetableDetailStep = currentStepInfo.stepId === CreateStep.TIMTETABLE_DETAIL;
+  const currentStepInfo = createStepInfo.find((stepInfo) => stepInfo.stepId === currentStepId)!;
+  const lastStepId = useRef(currentStepId);
+
+  const isRequiredStep = currentStepId === CreateStep.REQUIRED;
+  const isTemplateStep = currentStepId === CreateStep.TEMPLATE;
+  const isTimetableStep = currentStepId === CreateStep.TIMETABLE;
+  const isTimetableDetailStep = currentStepId === CreateStep.TIMTETABLE_DETAIL;
 
   const updateFormData = (data: Partial<CreateFormSchema>) => {
     setFormDataForSubmit({ ...formDataForSubmit, ...data });
   };
 
-  const updatesetCurrentStepInfo = (nextStep: CreateStep) => {
-    setCurrentStepInfo(createStepInfo.find((stepInfo) => stepInfo.stepId === nextStep)!);
+  const updateCurrentStepId = (nextStep: CreateStep) => {
+    setCurrentStepId(nextStep);
 
-    if (lastStep.current < nextStep) {
-      lastStep.current = nextStep;
+    if (lastStepId.current < nextStep) {
+      lastStepId.current = nextStep;
     }
   };
 
@@ -158,7 +160,7 @@ export default function Page() {
     }
 
     updateFormData(data);
-    updatesetCurrentStepInfo(nextStep);
+    updateCurrentStepId(nextStep);
   };
 
   return (
@@ -171,14 +173,12 @@ export default function Page() {
             <Step
               step={stepInfo.stepId + 1}
               title={stepInfo.title}
-              isCurrentStep={currentStepInfo.stepId === stepInfo.stepId}
-              isDoneStep={stepInfo.stepId < currentStepInfo.stepId}
-              isClickable={stepInfo.stepId <= lastStep.current}
-              onClick={() => updatesetCurrentStepInfo(stepInfo.stepId)}
+              isCurrentStep={currentStepId === stepInfo.stepId}
+              isDoneStep={stepInfo.stepId < currentStepId}
+              isClickable={stepInfo.stepId <= lastStepId.current}
+              onClick={() => updateCurrentStepId(stepInfo.stepId)}
             />
-            {index !== createStepInfo.at(-1)!.stepId && (
-              <StepSeparate isProgressed={stepInfo.stepId < currentStepInfo.stepId} />
-            )}
+            {index !== createStepInfo.at(-1)!.stepId && <StepSeparate isProgressed={stepInfo.stepId < currentStepId} />}
           </Fragment>
         ))}
       </menu>
