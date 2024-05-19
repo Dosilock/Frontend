@@ -1,11 +1,17 @@
 import { create } from 'zustand';
 
+export enum PeriodType {
+  STUDY,
+  RECESS,
+}
+
 export type Period = {
   id: number;
   name: string;
+  type: PeriodType;
   startTime: Date;
   duration: number;
-  isAttendacneRequired: boolean;
+  isAttendanceRequired: boolean;
 };
 
 export enum PeriodStatus {
