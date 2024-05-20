@@ -1,14 +1,17 @@
 'use client';
 
+import { LoginServiceRequest, loginService } from '@/app/actions';
 import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
+import { FetchStatus } from '@/lib/fetcher';
+import { ActionStatus } from '@/types/actions';
 import { ErrorObject } from '@/types/api';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useState } from 'react';
 import { Control, useForm } from 'react-hook-form';
 import { z } from 'zod';
-import { loginService } from './LoginForm.action';
+// import { loginService } from './LoginForm.action';
 
 const formSchema = z.object({
   email: z.string().email('이메일 형식을 따라주셈'),
@@ -57,13 +60,33 @@ export const LoginForm = ({ onSuccess }: LoginFormProps) => {
     setErrorState(null);
     setIsPending(true);
 
-    const { status, payload } = await loginService(loginValues);
+    const { status: actionStatus, actionResponse } = await loginService(loginValues);
 
-    if (status === 500) {
-      setErrorState(payload);
-      setIsPending(false);
+    console.log({ actionStatus });
+
+    if (actionStatus === ActionStatus.NETWORK_ERROR) {
+      // TODO: Toast 띄우기
+      return;
     }
 
+    const { status, fetchResponse } = actionResponse;
+
+    console.log({ status });
+
+    if (status === FetchStatus.FAIL) {
+      console.log({ actionResponse });
+      // 실패 응답
+      const { payload: errorObject } = fetchResponse;
+
+      console.log({ errorObject });
+
+      setErrorState(errorObject);
+      setIsPending(false);
+
+      return;
+    }
+
+    // 성공 응답
     return onSuccess();
   };
 
