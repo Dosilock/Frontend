@@ -1,140 +1,121 @@
-import { ActionResponse, ActionStatus } from '@/types/actions';
-import { APIResponse, ErrorResponse, SuccessResponse } from '@/types/api';
+'use server';
 
-export enum FetchStatus {
-  SUCCESS = 'success',
-  FAIL = 'fail',
-}
-
-export type FetchSuccessResponse<T> = {
-  status: FetchStatus.SUCCESS;
-  fetchResponse: SuccessResponse<T>;
-};
-
-export type FetchFailResponse = {
-  status: FetchStatus.FAIL;
-  fetchResponse: ErrorResponse;
-};
-
-export type FetchResponse<T> = FetchSuccessResponse<T> | FetchFailResponse;
-
-const handleResponse = async <T>(response: Response): Promise<FetchResponse<T>> => {
-  console.log(`${response.status} >> ${response.url}`);
-
-  // 정상 응답
-  if (response.ok) {
-    return {
-      status: FetchStatus.SUCCESS,
-      fetchResponse: await response.json(),
-    } as FetchSuccessResponse<T>;
-  }
-
-  /**
-   * handle failed HTTP Status
-   * 아래와 같은 방식으로 제어하려고 했으나, 서버 API쪽에서 이거 자체를 내려주니까 Type만 지정해서 넘겨주면 됨
-   */
-
-  // if (response.status === 404) {
-  //   return { status: 404, payload: { errorCode: 1101, errorMessage: '찾을 수 없음' } } as ErrorResponse;
-  // }
-
-  // if (response.status === 500) {
-  //   return { status: 500, payload: { errorCode: 1101, errorMessage: '먼가 잘못됨' } } as ErrorResponse;
-  // }
-
-  const res = await response.json();
-  console.log({ res });
-
-  return {
-    status: FetchStatus.FAIL,
-    fetchResponse: res,
-  } as FetchFailResponse;
-};
-
-export enum HTTPMethod {
-  GET = 'get',
-  POST = 'post',
-  PUT = 'put',
-  DELETE = 'delete',
-  PATCH = 'patch',
-}
-
-type Fetcher = {
-  [key in HTTPMethod]: <T, U = undefined>(url: string, headers?: Object, body?: U) => Promise<FetchResponse<T>>;
-};
-
-export const Fetcher: Fetcher = {
-  get: async <T>(url: string, headers = {}) => await handleResponse<T>(await fetch(url, { headers })),
-  post: async <T, U>(url: string, headers = {}, body: U) =>
-    await handleResponse<T>(
-      await fetch(url, {
-        method: 'POST',
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-          ...headers,
-        },
-        body: JSON.stringify(body),
-      })
-    ),
-  put: async <T, U>(url: string, headers = {}, body: U) =>
-    await handleResponse<T>(
-      await fetch(url, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          ...headers,
-        },
-        body: JSON.stringify(body),
-      })
-    ),
-  delete: async <T>(url: string, headers = {}) =>
-    await handleResponse<T>(
-      await fetch(url, {
-        method: 'DELETE',
-        headers,
-      })
-    ),
-  patch: async <T, U>(url: string, headers = {}, body: U) =>
-    await handleResponse<T>(
-      await fetch(url, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          ...headers,
-        },
-        body: JSON.stringify(body),
-      })
-    ),
-};
+import { createServerAxios } from '@/axios/serverAxios';
+import {
+  ErrorObject,
+  FetchFailResponse,
+  FetchNetworkErrorResponse,
+  FetchStatus,
+  FetchSuccessResponse,
+  FetchUnknownErrorResponse,
+  HTTPMethod,
+} from '@/types/api';
+import { AxiosRequestConfig, AxiosResponse, isAxiosError } from 'axios';
+import { cookies } from 'next/headers';
 
 export const requestAPI = async <T, U = undefined>(
   method: HTTPMethod,
   url: string,
-  headers = {},
-  body?: U
-): Promise<ActionResponse<T>> => {
-  // Network Error or CORS 오류를 처리하기 위한 요청 함수
+  body?: U,
+  config?: AxiosRequestConfig
+) => {
+  console.log(`[${method}] ${url}`);
+
+  /** Server Axios */
+  const serverAxios = createServerAxios();
+
+  /** Browser Cookies */
+  const allCookies = cookies()
+    .getAll()
+    .map((cookie) => `${cookie.name}=${cookie.value}`)
+    .join(';');
 
   try {
-    // 정상 응답
-    return {
-      status: ActionStatus.RESPONSED,
-      actionResponse: await Fetcher[method]<T, U>(url, headers, body),
-    } as ActionResponse<T>;
-  } catch (error) {
-    // Network Error or CORS
-    if (error instanceof Error) {
-      return {
-        status: ActionStatus.NETWORK_ERROR,
-        actionResponse: error,
-      } as ActionResponse<T>;
+    const response = await serverAxios[method]<T, AxiosResponse<T>, U>(url, body, {
+      ...config,
+      headers: {
+        'Content-Type': 'application/json',
+        ...config?.headers,
+        cookie: allCookies,
+      },
+    });
+
+    /** 성공 응답 시 아래의 로직 진행 */
+
+    console.log(`[${method}] ${url} >> ${response.status}`);
+
+    const setCookies = response.headers['set-cookie'];
+
+    /** 응답에 Set-Cookie가 있다면 cookies()에 저장 */
+    if (setCookies) {
+      setCookies.map((cookie) => {
+        const [key, ...values] = cookie.split('=');
+        cookies().set(key, values.join(' '));
+      });
     }
-    ``;
-    // TypeError가 아닌 에러 처리..인데 이런 경우는 개발할 때 throw SOMETHING 이런 거 아니면 안 넘어올 듯?
-    return {
-      status: ActionStatus.NETWORK_ERROR,
-      actionResponse: new Error(String(error)),
-    } as ActionResponse<T>;
+
+    const suscessResponse: FetchSuccessResponse<T> = {
+      status: FetchStatus.SUCCESS,
+      data: response.data,
+    };
+
+    return suscessResponse;
+  } catch (error) {
+    /** 실패 응답 시 아래 로직 진행 */
+
+    if (isAxiosError<T, U>(error)) {
+      const hasResponse = error.response !== undefined;
+
+      console.log(
+        `[${method}] ${url} >> ${error.response?.status} ${error.response?.statusText} ${
+          typeof error.response?.data === 'string'
+            ? error.response?.data
+            : typeof error.response?.data === 'object'
+            ? JSON.stringify(error.response?.data)
+            : null
+        }`
+      );
+
+      // API 오류
+      if (hasResponse) {
+        const errorResponse: FetchFailResponse = {
+          status: FetchStatus.FAIL,
+          data: error.response!.data as ErrorObject,
+        };
+
+        return errorResponse;
+      }
+
+      const hasRequest = error.request !== undefined;
+
+      // 네트워크 오류(disconnected, timeout, cors, etc...)
+      if (hasRequest) {
+        const errorObject = new Error(error.message);
+        errorObject.name = error.name;
+
+        const errorResponse: FetchNetworkErrorResponse = {
+          status: FetchStatus.NETWORK_ERROR,
+          data: errorObject,
+        };
+
+        return errorResponse;
+      }
+
+      // 있을 수 없는 오류(진)
+      const unknownErrorResponse: FetchUnknownErrorResponse = {
+        status: FetchStatus.UNKNOWN_ERROR,
+        data: String(error),
+      };
+
+      return unknownErrorResponse;
+    }
+
+    // 있을 수 없는 오류(진)
+    const unknownErrorResponse: FetchUnknownErrorResponse = {
+      status: FetchStatus.UNKNOWN_ERROR,
+      data: String(error),
+    };
+
+    return unknownErrorResponse;
   }
 };
