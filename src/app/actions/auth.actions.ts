@@ -1,6 +1,7 @@
 'use server';
 
-import { HTTPMethod, requestAPI } from '@/lib/fetcher';
+import { requestAPI } from '@/lib/fetcher';
+import { HTTPMethod } from '@/types/api';
 
 const BASE_API_URL = 'https://dosilock.kro.kr/api/v1';
 // const BASE_API_URL = process.env.NODE_ENV === 'development' ? 'localhost:3000' : process.env.BASE_API_URL;
@@ -28,6 +29,5 @@ export type LoginServiceRequest = {
 
 const testEndpoint = `${BASE_API_URL}/signin`;
 export const loginService = async (payload: LoginServiceRequest) => {
-  return await requestAPI<EmptyResponse, LoginServiceRequest>(HTTPMethod.POST, testEndpoint, {}, payload);
-  // return await requestAPI<EmptyResponse, LoginServiceRequest>(HTTPMethod.POST, AUTH_ENDPOINT.Login, payload);
+  return await requestAPI<null, LoginServiceRequest>(HTTPMethod.POST, testEndpoint, payload);
 };

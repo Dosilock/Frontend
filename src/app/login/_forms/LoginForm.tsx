@@ -1,13 +1,12 @@
 'use client';
 
-import { LoginServiceRequest, loginService } from '@/app/actions';
+import { loginService } from '@/app/actions';
 import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { FetchStatus } from '@/lib/fetcher';
-import { ActionStatus } from '@/types/actions';
-import { ErrorObject } from '@/types/api';
+import { ErrorObject, FetchStatus } from '@/types/api';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { Control, useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -33,15 +32,20 @@ const initialValues: LoginRequest = {
 };
 
 type LoginFormProps = {
-  onSuccess: () => Promise<void>;
+  redirectUrl: string;
 };
 
-export const LoginForm = ({ onSuccess }: LoginFormProps) => {
+export const LoginForm = ({ redirectUrl }: LoginFormProps) => {
+  const router = useRouter();
+
   // 폼 제출 Pending
   const [isPending, setIsPending] = useState(false);
+  const startPending = () => setIsPending(true);
+  const releasePending = () => setIsPending(false);
 
   // Server Validation 관련
   const [errorState, setErrorState] = useState<ErrorObject | null>(null);
+  const resetErrorState = () => setErrorState(null);
 
   // Client Validation 관련
   const form = useForm<LoginRequest>({
@@ -57,37 +61,34 @@ export const LoginForm = ({ onSuccess }: LoginFormProps) => {
   };
 
   const requestLogin = async (loginValues: LoginRequest) => {
-    setErrorState(null);
-    setIsPending(true);
+    startPending();
+    resetErrorState();
 
-    const { status: actionStatus, actionResponse } = await loginService(loginValues);
+    const { status, data } = await loginService(loginValues);
 
-    console.log({ actionStatus });
-
-    if (actionStatus === ActionStatus.NETWORK_ERROR) {
-      // TODO: Toast 띄우기
-      return;
+    if (status === FetchStatus.SUCCESS) {
+      router.push(redirectUrl);
     }
-
-    const { status, fetchResponse } = actionResponse;
-
-    console.log({ status });
 
     if (status === FetchStatus.FAIL) {
-      console.log({ actionResponse });
-      // 실패 응답
-      const { payload: errorObject } = fetchResponse;
-
-      console.log({ errorObject });
-
-      setErrorState(errorObject);
-      setIsPending(false);
-
+      setErrorState(data);
+      releasePending();
       return;
     }
 
-    // 성공 응답
-    return onSuccess();
+    if (status === FetchStatus.NETWORK_ERROR) {
+      // TODO: Toast 띄우기
+      console.error('[NETWORK_ERROR]: requestLogin, ', data);
+      releasePending();
+      return;
+    }
+
+    if (status === FetchStatus.UNKNOWN_ERROR) {
+      // TODO: Toast 띄우기
+      console.error('[UNKNWON_ERROR]: requestLogin, ', data);
+      releasePending();
+      return;
+    }
   };
 
   return (
