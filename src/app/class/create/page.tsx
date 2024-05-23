@@ -11,8 +11,9 @@ import { RequiredForm } from './_forms/RequiredForm';
 import { TemplateForm } from './_forms/TemplateForm';
 import { TimetableDetailForm } from './_forms/TimetableDetailForm';
 import { TimetableForm } from './_forms/TimetableForm';
-import { createClazzWithTimetable } from './_actions/actions';
 import { useRouter } from 'next/navigation';
+import { CreateClazzWithTimetableRequest, createClazzWithTimetable } from '@/app/actions';
+import { FetchStatus } from '@/types/api';
 // import { useRouter } from 'next/router';
 
 // TODO: 배포 후에 초기 로딩 시간 측정해보고 좀 많이 크면 Code Spliting 해보기
@@ -148,13 +149,42 @@ export default function Page() {
   const handleNext = async ({ data, nextStep }: { data: Partial<CreateFormSchema>; nextStep: CreateStep }) => {
     if (nextStep === CreateStep.SUBMIT) {
       const submitData = { ...formDataForSubmit, ...data } as CreateFormSchema;
-      const { status, payload } = await createClazzWithTimetable(submitData);
 
-      if (status === 200) {
-        router.push(`/class/create/complete?clazzId=${payload.clazzId}`);
-      } else {
-        throw new Error('반 생성 실패 ㅠ');
+      const requestData: CreateClazzWithTimetableRequest = {
+        clazzName: submitData.name,
+        clazzDescription: submitData.description,
+        clazzIcon: submitData.emoji,
+        timetableRequest: {
+          timetableName: submitData.timetableName,
+          timetableDays: submitData.dayOfWeeks,
+          periodRequests: submitData.periods.map((period) => ({
+            periodName: period.name,
+            periodDuration: period.duration,
+            periodStartTime: period.startTime,
+            isAttendanceRequired: period.isAttendanceRequired === AttendanceType.YES ? true : false,
+          })),
+        },
+      };
+
+      const { status, data: response } = await createClazzWithTimetable(requestData);
+
+      // TODO: error handling
+      if (status === FetchStatus.FAIL) {
+        console.error(response.errorMessage);
+        return;
       }
+
+      if (status === FetchStatus.NETWORK_ERROR) {
+        console.error('[NETWORK_ERROR]: handleNext, ', response.message);
+        return;
+      }
+
+      if (status === FetchStatus.UNKNOWN_ERROR) {
+        console.error('[UNKNOWN_ERROR]: handleNext, ', response);
+        return;
+      }
+
+      router.push(`/class/create/complete?clazzId=${response.clazzLink}`);
 
       return;
     }
