@@ -30,15 +30,27 @@ export const requestAPI = async <T, U = undefined>(
     .map((cookie) => `${cookie.name}=${cookie.value}`)
     .join(';');
 
+  const axiosConfig: AxiosRequestConfig = {
+    ...config,
+    withCredentials: true,
+    headers: {
+      ...config?.headers,
+      Cookie: allCookies,
+    },
+  };
+
   try {
-    const response = await serverAxios[method]<T, AxiosResponse<T>, U>(url, body, {
-      ...config,
-      headers: {
-        'Content-Type': 'application/json',
-        ...config?.headers,
-        cookie: allCookies,
-      },
-    });
+    let response = null;
+
+    if (method === HTTPMethod.GET) {
+      response = await serverAxios.get<T, AxiosResponse<T>, U>(url, axiosConfig);
+    } else if (method === HTTPMethod.POST) {
+      response = await serverAxios.post<T, AxiosResponse<T>, U>(url, body, axiosConfig);
+    } else if (method === HTTPMethod.PATCH) {
+      response = await serverAxios.patch<T, AxiosResponse<T>, U>(url, body, axiosConfig);
+    } else {
+      response = await serverAxios.put<T, AxiosResponse<T>, U>(url, body, axiosConfig);
+    }
 
     /** 성공 응답 시 아래의 로직 진행 */
 
