@@ -1,6 +1,10 @@
 'use server';
 
-const BASE_API_URL = process.env.NODE_ENV === 'development' ? 'localhost:3000' : process.env.BASE_API_URL;
+import { requestAPI } from '@/lib/fetcher';
+import { HTTPMethod } from '@/types/api';
+
+const BASE_API_URL = 'https://dosilock.kro.kr/api/v1';
+// const BASE_API_URL = process.env.NODE_ENV === 'development' ? 'localhost:3000' : process.env.BASE_API_URL;
 const USERS_API_URL = `${BASE_API_URL}/users`;
 
 const USERS_ENDPOINT = {
@@ -11,11 +15,12 @@ const USERS_ENDPOINT = {
   myClazz: `${USERS_API_URL}/me/clazz`,
 };
 
-export const fetchMyDetails = async () => {
-  return await fetch(USERS_ENDPOINT.mypage, {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-    },
+type ResetPasswordRequest = {
+  password: string;
+};
+
+export const resetPassword = async ({ password }: ResetPasswordRequest) => {
+  return await requestAPI<null, ResetPasswordRequest>(HTTPMethod.PATCH, `${BASE_API_URL}/users/reset-password`, {
+    password,
   });
 };
