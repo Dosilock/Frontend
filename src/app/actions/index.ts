@@ -20,7 +20,7 @@
  * 3. fetch 오류
  */
 
-export * from './auth.actions';
-export * from './class.actions';
-export * from './timetable.actions';
-export * from './users.actions';
+export { loginService, sendResetPasswordMail, sendSignUpMail, signUpWithEmail } from './auth.actions';
+export { createClazzWithTimetable, fetchMyClazzList } from './class.actions';
+export { fetchTimetableDetails } from './timetable.actions';
+export { resetPassword } from './users.actions';

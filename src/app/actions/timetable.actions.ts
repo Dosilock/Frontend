@@ -1,18 +1,22 @@
 'use server';
 
-const BASE_API_URL = process.env.NODE_ENV === 'development' ? 'localhost:3000' : process.env.BASE_API_URL;
-const TIMETABLE_API_URL = `${BASE_API_URL}/timetable`;
+import { requestAPI } from '@/lib/fetcher';
+import { HTTPMethod } from '@/types/api';
+import { BASE_API_URL } from './_constants';
 
-const TIMETABLE_ENDPOINT = {
-  Default: `${TIMETABLE_API_URL}`,
-  At: (timetableId: string) => `${TIMETABLE_API_URL}/${timetableId}`,
+// export const fetchTimetableDetails = async (timetableId: string) => {
+//   return await fetch(TIMETABLE_ENDPOINT.At(timetableId), {
+//     method: 'GET',
+//     headers: {
+//       'Content-Type': 'application/json',
+//     },
+//   });
+// };
+
+type FetchTimetableDetailsRequest = {
+  clazzId: string;
 };
 
-export const fetchTimetableDetails = async (timetableId: string) => {
-  return await fetch(TIMETABLE_ENDPOINT.At(timetableId), {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  });
+export const fetchTimetableDetails = async (payload: FetchTimetableDetailsRequest) => {
+  return await requestAPI<null, FetchTimetableDetailsRequest>(HTTPMethod.GET, `${BASE_API_URL}/timetable`, payload);
 };
